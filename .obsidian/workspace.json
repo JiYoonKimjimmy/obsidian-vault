@@ -1,0 +1,241 @@
+{
+  "main": {
+    "id": "629cac3b90e2f960",
+    "type": "split",
+    "children": [
+      {
+        "id": "41fb172e27040191",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1671be59039b9d71",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "1. Project/영암 월출페이 이관/영암 월출페이 운영 테스트 시나리오.md",
+                "mode": "source",
+                "source": false
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "영암 월출페이 운영 테스트 시나리오"
+            }
+          },
+          {
+            "id": "51c1f217fc665962",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "2. Area/Interview/2025_힐링페이퍼/Code Review Interview.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Code Review Interview"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "08ead31c81963e6f",
+    "type": "split",
+    "children": [
+      {
+        "id": "0860808c4fd97632",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "aee4b4e126ccb4b8",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "파일 탐색기"
+            }
+          },
+          {
+            "id": "833033f6ff301f1b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "08dc10f87cd3d69d",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 248.5
+  },
+  "right": {
+    "id": "cffdedfc60098bb9",
+    "type": "split",
+    "children": [
+      {
+        "id": "c96aed9447d33801",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2615a4aef952f7ed",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "백링크"
+            }
+          },
+          {
+            "id": "7878a944b2857c3a",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "에러 메시지 정의 필요 항목.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 에러 메시지 정의 필요 항목"
+            }
+          },
+          {
+            "id": "fce4c754b9736ac1",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "5fd3eb0840c5626d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "개요"
+            }
+          },
+          {
+            "id": "7cd9e90347036ab3",
+            "type": "leaf",
+            "state": {
+              "type": "calendar",
+              "state": {},
+              "icon": "calendar-with-checkmark",
+              "title": "Calendar"
+            }
+          },
+          {
+            "id": "053355abfe22ab7d",
+            "type": "leaf",
+            "state": {
+              "type": "git-history-view",
+              "state": {},
+              "icon": "history",
+              "title": "History"
+            }
+          }
+        ],
+        "currentTab": 5
+      }
+    ],
+    "direction": "horizontal",
+    "width": 329.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:빠른 전환기 열기": false,
+      "graph:그래프 뷰 열기": false,
+      "canvas:새 캔버스 만들기": false,
+      "daily-notes:오늘의 일일 노트 열기": false,
+      "templates:템플릿 삽입": false,
+      "command-palette:명령어 팔레트 열기": false,
+      "obsidian-excalidraw-plugin:New drawing": false,
+      "periodic-notes:Open today": false,
+      "obsidian-git:Open Git source control": false
+    }
+  },
+  "active": "053355abfe22ab7d",
+  "lastOpenFiles": [
+    "2. Area/Interview/2025_힐링페이퍼",
+    "2. Area/Interview",
+    "1. Project/영암 월출페이 이관/영암 월출페이 운영 테스트 시나리오.md",
+    "2. Area/Interview/2025_힐링페이퍼/Code Review Interview.md",
+    "1. Project/힐링페이퍼",
+    "무제 1",
+    "Periodic Notes/3. Monthly/2025-02.md",
+    "Periodic Notes/1. Daily/2025-02-19.md",
+    "1. Project/영암 월출페이 이관",
+    "Excalidraw/Drawing 2025-02-19 17.27.52.excalidraw.md",
+    "Excalidraw/Drawing 2025-02-19 17.27.52_0.excalidraw.md",
+    "Excalidraw",
+    "PARA.md",
+    "Periodic Notes",
+    "4. Archive",
+    "3. Resource",
+    "2. Area",
+    "1. Project",
+    "무제.canvas",
+    "1. Daily/2025-02-12.md",
+    "2. Weekly/2025-W07.md",
+    "3. Monthly/2025-02.md",
+    "Untitled 1.canvas",
+    "Untitled.canvas",
+    "에러 메시지 정의 필요 항목.md",
+    "Untitled 1.md",
+    "Untitled 2.md",
+    "Untitled 3.md",
+    "2023-12-04.md"
+  ]
+}
