@@ -165,8 +165,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -181,11 +180,14 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "a798c2f61ca912c3",
+  "active": "f4033ed7822f06b3",
   "lastOpenFiles": [
+    "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 변화.png",
     "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/image/step별 성능 측정.png",
+    "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/image",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/5차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/2차 개선.md",
