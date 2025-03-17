@@ -8,17 +8,19 @@
         "type": "tabs",
         "children": [
           {
-            "id": "ca751a47c602c670",
+            "id": "e644427c722b94fb",
             "type": "leaf",
+            "pinned": true,
             "state": {
               "type": "markdown",
               "state": {
-                "file": "1. Project/가맹점 Batch 시스템 성능 개선/6차 개선.md",
+                "file": "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
                 "mode": "source",
                 "source": false
               },
+              "pinned": true,
               "icon": "lucide-file",
-              "title": "6차 개선"
+              "title": "02. Result"
             }
           }
         ]
@@ -191,18 +193,21 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "ca751a47c602c670",
+  "active": "e644427c722b94fb",
   "lastOpenFiles": [
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/2차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/1차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring",
+    "1. Project/가맹점 Batch 시스템 성능 개선/개선 사항",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
     "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
     "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/6차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/2차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/1차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/00. Ready.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/3차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/4차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/5차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/3차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/5차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/1차 개선 사항.md",
     "1. Project/RCS 준준회원 가입/2025-03-14 RCS 준준회원 가입 관련 회의.md",
     "1. Project/영암 월출페이 이관/03. 영암 월출페이 RCS 포탈 회원가입.md",
@@ -225,10 +230,6 @@
     "09_TSS_PREV_BALANCE_데이터 보정.sql",
     "08_TSS_PREV_테이블 마이그레이션.sql",
     "07_YEONGAM_PREV_TRANSACTION_DETAIL.sql",
-    "06_YEONGAM_PREV_TRANSACTION.sql",
-    "05_YEONGAM_PREV_DEBIT_CARD.sql",
-    "Periodic Notes/1. Daily/2025-02-24.md",
-    "Periodic Notes/1. Daily/2025-02-25.md",
     "무제.canvas",
     "Untitled 1.canvas",
     "Untitled.canvas"
