@@ -1,14 +1,14 @@
 {
   "main": {
-    "id": "629cac3b90e2f960",
+    "id": "b170c7f26f3d45c8",
     "type": "split",
     "children": [
       {
-        "id": "fc2fd32167b4fe57",
+        "id": "0a8cbd1176bc6a35",
         "type": "tabs",
         "children": [
           {
-            "id": "e644427c722b94fb",
+            "id": "a798c2f61ca912c3",
             "type": "leaf",
             "pinned": true,
             "state": {
@@ -29,15 +29,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "08ead31c81963e6f",
+    "id": "e562a712e6e6f2ec",
     "type": "split",
     "children": [
       {
-        "id": "0860808c4fd97632",
+        "id": "d30240612f89ce49",
         "type": "tabs",
         "children": [
           {
-            "id": "aee4b4e126ccb4b8",
+            "id": "f4033ed7822f06b3",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -50,7 +50,7 @@
             }
           },
           {
-            "id": "833033f6ff301f1b",
+            "id": "58b1b89f01a7d067",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -63,40 +63,40 @@
                 "sortOrder": "alphabetical"
               },
               "icon": "lucide-search",
-              "title": "Search"
+              "title": "검색"
             }
           },
           {
-            "id": "08dc10f87cd3d69d",
+            "id": "72175ae6a458f1b9",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
               "state": {},
               "icon": "lucide-bookmark",
-              "title": "Bookmarks"
+              "title": "북마크"
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 294.5
+    "width": 300
   },
   "right": {
-    "id": "cffdedfc60098bb9",
+    "id": "ad5cbe0df6906fb2",
     "type": "split",
     "children": [
       {
-        "id": "c96aed9447d33801",
+        "id": "1e5ea77fc565b873",
         "type": "tabs",
         "children": [
           {
-            "id": "2615a4aef952f7ed",
+            "id": "34c778f875574d7a",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "1. Project/가맹점 배치 성능 개선/01. Analysis.md",
+                "file": "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -106,25 +106,24 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "01. Analysis 의 백링크"
+              "title": "02. Result 의 백링크"
             }
           },
           {
-            "id": "7878a944b2857c3a",
+            "id": "984738f96cd179d6",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "1. Project/가맹점 배치 성능 개선/01. Analysis.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "01. Analysis 의 나가는 링크"
+              "title": "나가는 링크"
             }
           },
           {
-            "id": "fce4c754b9736ac1",
+            "id": "26dd786ae6135eaa",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -139,22 +138,21 @@
             }
           },
           {
-            "id": "5fd3eb0840c5626d",
+            "id": "b8370dd856106c8a",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "1. Project/가맹점 배치 성능 개선/01. Analysis.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "01. Analysis 의 개요"
+              "title": "개요"
             }
           },
           {
-            "id": "7cd9e90347036ab3",
+            "id": "ca9e7830136c7bb1",
             "type": "leaf",
             "state": {
               "type": "calendar",
@@ -162,23 +160,13 @@
               "icon": "calendar-with-checkmark",
               "title": "Calendar"
             }
-          },
-          {
-            "id": "053355abfe22ab7d",
-            "type": "leaf",
-            "state": {
-              "type": "git-history-view",
-              "state": {},
-              "icon": "history",
-              "title": "History"
-            }
           }
-        ],
-        "currentTab": 5
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 351.5
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -188,50 +176,39 @@
       "daily-notes:오늘의 일일 노트 열기": false,
       "templates:템플릿 삽입": false,
       "command-palette:명령어 팔레트 열기": false,
-      "obsidian-excalidraw-plugin:New drawing": false,
       "obsidian-git:Open Git source control": false,
-      "periodic-notes:Open today": false
+      "obsidian-excalidraw-plugin:New drawing": false
     }
   },
-  "active": "e644427c722b94fb",
+  "active": "a798c2f61ca912c3",
   "lastOpenFiles": [
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/2차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/1차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring",
-    "1. Project/가맹점 Batch 시스템 성능 개선/개선 사항",
+    "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/00. Ready.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/3차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/5차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/1차 개선 사항.md",
-    "1. Project/RCS 준준회원 가입/2025-03-14 RCS 준준회원 가입 관련 회의.md",
-    "1. Project/영암 월출페이 이관/03. 영암 월출페이 RCS 포탈 회원가입.md",
-    "1. Project/영암 월출페이 이관/01. 운영 테스트 시나리오.md",
-    "1. Project/영암 월출페이 이관/02. 운영 데이터 이관 관련 문의.md",
-    "무제 1.md",
-    "1. Project/영암 월출페이 이관/04. 월출페이 개발.md",
-    "1. Project/RCS 준준회원 가입/무제.md",
-    "1. Project/RCS 준준회원 가입",
-    "1. Project/영암 월출페이 이관/무제.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/2차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/3차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/1차 개선.md",
+    "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring",
     "Periodic Notes/1. Daily/2025-03-14.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/4차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/6차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/5차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/3차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/2차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/1차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/00. Ready.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선",
+    "1. Project/RCS 준준회원 가입/2025-03-14 RCS 준준회원 가입 관련 회의.md",
+    "1. Project/RCS 준준회원 가입",
     "2. Area/Interview/2025/모요/Tech Interview.md",
-    "2. Area/Interview/2025/모요",
+    "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
+    "1. Project/Virtual Waiting Room 시스템 구축/01. System Architecture Design.md",
     "2. Area/Interview/2025/힐링페이퍼/Code Review Interview.md",
-    "2. Area/Interview/2025",
-    "02..md",
-    "1. Project/대기열 시스템 구축/01. System Architecture Design.md",
-    "1. Project/Virtual Waiting Room 시스템 구축",
-    "10_TSS_PREV_MERCHANT_데이터 보정.sql",
-    "09_TSS_PREV_BALANCE_데이터 보정.sql",
-    "08_TSS_PREV_테이블 마이그레이션.sql",
-    "07_YEONGAM_PREV_TRANSACTION_DETAIL.sql",
-    "무제.canvas",
-    "Untitled 1.canvas",
-    "Untitled.canvas"
+    "2. Area/Interview/2025/힐링페이퍼",
+    "2. Area/Interview/2025/모요",
+    "2. Area/Interview/2025"
   ]
 }
