@@ -8,9 +8,8 @@
         "type": "tabs",
         "children": [
           {
-            "id": "e644427c722b94fb",
+            "id": "f3432d25fe52072b",
             "type": "leaf",
-            "pinned": true,
             "state": {
               "type": "markdown",
               "state": {
@@ -18,21 +17,20 @@
                 "mode": "source",
                 "source": false
               },
-              "pinned": true,
               "icon": "lucide-file",
               "title": "02. Result"
             }
           },
           {
-            "id": "bbc768aae16e7e95",
+            "id": "8dbb1f39d6a01a58",
             "type": "leaf",
             "state": {
               "type": "image",
               "state": {
-                "file": "1. Project/가맹점 Batch 시스템 성능 개선/image/최종 성능 측정.png"
+                "file": "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 측정 결과.png"
               },
               "icon": "lucide-image",
-              "title": "최종 성능 측정"
+              "title": "단계별 성능 측정 결과"
             }
           }
         ]
@@ -205,11 +203,11 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "e644427c722b94fb",
+  "active": "f3432d25fe52072b",
   "lastOpenFiles": [
-    "1. Project/가맹점 Batch 시스템 성능 개선/image/최종 성능 측정.png",
+    "1. Project/가맹점 Batch 시스템 성능 개선/image/최종 성능 측정 결과.png",
     "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 변화.png",
+    "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 측정 결과.png",
     "1. Project/가맹점 Batch 시스템 성능 개선/image",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/2차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/1차 개선.md",
