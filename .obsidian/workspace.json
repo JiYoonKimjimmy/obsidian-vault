@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
+                "file": "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "01. System Requirement"
+              "title": "02. Result"
             }
           }
         ]
@@ -193,6 +193,7 @@
   },
   "active": "2d3218d3ea2552bd",
   "lastOpenFiles": [
+    "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
     "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
@@ -204,7 +205,6 @@
     "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring",
     "1. Project/가맹점 Batch 시스템 성능 개선/개선 사항",
-    "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/00. Ready.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/3차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
