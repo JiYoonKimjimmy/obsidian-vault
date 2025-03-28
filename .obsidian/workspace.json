@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
+                "file": "1. Project/RCS 준준회원 가입/2025-03-25 RCS 준준회원 가입 관련 기획 리뷰.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "02. System Architecture"
+              "title": "2025-03-25 RCS 준준회원 가입 관련 기획 리뷰"
             }
           }
         ]
@@ -193,10 +193,10 @@
   },
   "active": "05a84ef2a3bc2a65",
   "lastOpenFiles": [
-    "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
     "1. Project/RCS 준준회원 가입/2025-03-14 RCS 준준회원 가입 관련 회의.md",
     "1. Project/RCS 준준회원 가입/2025-03-25 RCS 준준회원 가입 관련 기획 리뷰.md",
+    "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
+    "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 측정 결과.png",
