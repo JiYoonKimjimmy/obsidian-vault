@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "1. Project/Virtual Waiting Room 시스템 구축/02.01. System Design Prompt.md",
+                "file": "1. Project/Virtual Waiting Room 시스템 구축/회의/20250415 KTC 아키텍처 리뷰.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "02.01. System Design Prompt"
+              "title": "20250415 KTC 아키텍처 리뷰"
             }
           }
         ],
@@ -208,9 +208,14 @@
   },
   "active": "34c5c8cc83eb1f9f",
   "lastOpenFiles": [
-    "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
     "1. Project/Virtual Waiting Room 시스템 구축/02.01. System Design Prompt.md",
+    "1. Project/Virtual Waiting Room 시스템 구축/회의/20250415 KTC 아키텍처 리뷰.md",
     "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
+    "1. Project/Virtual Waiting Room 시스템 구축/회의",
+    "1. Project/Virtual Waiting Room 시스템 구축/무제.md",
+    "1. Project/RSA 암호화 성능 개선/RSA 암호화 알고리즘 성능 측정.md",
+    "1. Project/RSA 암호화 성능 개선",
+    "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
     "1. Project/RCS 준준회원 가입/2025-03-25 RCS 준준회원 가입 관련 기획 리뷰.md",
     "1. Project/RCS 준준회원 가입/2025-03-14 RCS 준준회원 가입 관련 회의.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
@@ -236,16 +241,10 @@
     "1. Project/RCS 준준회원 가입/무제.md",
     "1. Project/RCS 준준회원 가입",
     "1. Project/영암 월출페이 이관/무제.md",
-    "Periodic Notes/1. Daily/2025-03-14.md",
-    "2. Area/Interview/2025/모요/Tech Interview.md",
     "2. Area/Interview/2025/모요",
-    "2. Area/Interview/2025/힐링페이퍼/Code Review Interview.md",
     "2. Area/Interview/2025",
-    "02..md",
     "1. Project/Virtual Waiting Room 시스템 구축",
     "10_TSS_PREV_MERCHANT_데이터 보정.sql",
-    "09_TSS_PREV_BALANCE_데이터 보정.sql",
-    "08_TSS_PREV_테이블 마이그레이션.sql",
     "무제.canvas",
     "Untitled 1.canvas",
     "Untitled.canvas"
