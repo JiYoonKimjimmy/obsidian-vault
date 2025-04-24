@@ -4,17 +4,43 @@
     "type": "split",
     "children": [
       {
-        "id": "d489fee13fe8b5b6",
+        "id": "3f9fd9e6a2bc65e4",
         "type": "tabs",
         "children": [
           {
-            "id": "71177ed30bec3e3c",
+            "id": "c0779a3dc02e739f",
             "type": "leaf",
+            "pinned": true,
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "2. Area/Interview/2025/ab180/1. AB180 System Requirement.md",
+                "mode": "source",
+                "source": false
+              },
+              "pinned": true,
               "icon": "lucide-file",
-              "title": "새 탭"
+              "title": "1. AB180 System Requirement"
+            }
+          }
+        ]
+      },
+      {
+        "id": "b493f69f3e961594",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e08f07e0715448ea",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "2. Area/Interview/2025/ab180/2. AB180 System Design.md"
+              },
+              "pinned": true,
+              "icon": "excalidraw-icon",
+              "title": "2. AB180 System Design"
             }
           }
         ]
@@ -90,6 +116,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "2. Area/Interview/2025/ab180/1. AB180 System Requirement.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +126,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "백링크"
+              "title": "1. AB180 System Requirement 의 백링크"
             }
           },
           {
@@ -158,7 +185,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -173,9 +201,23 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "f4033ed7822f06b3",
+  "active": "c0779a3dc02e739f",
   "lastOpenFiles": [
+    "2. Area/Interview/2025/ab180/images/04_users_logs.png",
+    "2. Area/Interview/2025/ab180/images/05_admin-expire-tokens.png",
+    "2. Area/Interview/2025/ab180/1. AB180 System Requirement.md",
+    "2. Area/Interview/2025/ab180/2. AB180 System Design.md",
+    "2. Area/Interview/2025/ab180/images/04_logs.png",
+    "2. Area/Interview/2025/ab180/images/03_users-signout.png",
+    "2. Area/Interview/2025/ab180/images/02_users-signin.png",
+    "2. Area/Interview/2025/ab180/images/01_users-signup.png",
+    "2. Area/Interview/2025/ab180/images/01_users-signup.png",
+    "2. Area/Interview/2025/ab180/images",
+    "Excalidraw/Drawing 2025-04-25 01.12.19.excalidraw.md",
+    "Excalidraw",
+    "2. Area/Interview/2025/ab180/무제.canvas",
     "conflict-files-obsidian-git.md",
+    "2. Area/Interview/2025/ab180",
     "1. Project/가맹점 Batch 시스템 성능 개선/image/최종 성능 측정 결과.png",
     "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 측정 결과.png",
     "1. Project/Virtual Waiting Room 시스템 구축/회의/20250415 KTC 아키텍처 리뷰.md",
@@ -188,7 +230,6 @@
     "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 변화.png",
     "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/image/step별 성능 측정.png",
     "1. Project/가맹점 Batch 시스템 성능 개선/image",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/5차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
@@ -206,13 +247,7 @@
     "1. Project/가맹점 Batch 시스템 성능 개선/1차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/00. Ready.md",
     "1. Project/가맹점 Batch 시스템 성능 개선",
-    "1. Project/RCS 준준회원 가입/2025-03-14 RCS 준준회원 가입 관련 회의.md",
     "1. Project/RCS 준준회원 가입",
-    "2. Area/Interview/2025/모요/Tech Interview.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/01. System Architecture Design.md",
-    "2. Area/Interview/2025/힐링페이퍼",
-    "2. Area/Interview/2025/모요",
-    "2. Area/Interview/2025"
+    "2. Area/Interview/2025/healingpaper"
   ]
 }
