@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "e1982deccc3d0535",
+        "id": "819647da56d03422",
         "type": "tabs",
         "children": [
           {
-            "id": "380e5af1843828aa",
+            "id": "a665111ba3af5eeb",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "1. Project/DMS 기부 서비스 고도화/20250514 환경 마일리지 기부 서비스.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "20250514 환경 마일리지 기부 서비스"
+              "title": "새 탭"
             }
           }
         ]
@@ -191,11 +187,11 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "380e5af1843828aa",
+  "active": "a665111ba3af5eeb",
   "lastOpenFiles": [
-    "1. Project/DMS 기부 서비스 고도화/20250513 환경 마일리지 기부 서비스.md",
-    "1. Project/DMS 기부 서비스 고도화/20250514 환경 마일리지 기부 서비스.md",
     "무제.md",
+    "1. Project/DMS 기부 서비스 고도화/20250514 환경 마일리지 기부 서비스.md",
+    "1. Project/DMS 기부 서비스 고도화/20250513 환경 마일리지 기부 서비스.md",
     "Excalidraw/Drawing 2025-04-25 01.12.19.excalidraw.md",
     "Excalidraw",
     "2. Area/Interview/2025/moyo/Tech Interview.md",
