@@ -1,24 +1,24 @@
 {
   "main": {
-    "id": "629cac3b90e2f960",
+    "id": "9810b580a383b4f0",
     "type": "split",
     "children": [
       {
-        "id": "819647da56d03422",
+        "id": "26f5c3e38e31d516",
         "type": "tabs",
         "children": [
           {
-            "id": "a665111ba3af5eeb",
+            "id": "d6b4b64312eecccb",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "1. Project/DMS 기부 서비스 고도화/20250514 환경 마일리지 기부 서비스.md",
+                "file": "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "20250514 환경 마일리지 기부 서비스"
+              "title": "Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서"
             }
           }
         ]
@@ -27,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "08ead31c81963e6f",
+    "id": "130dcb9d96b3ee5e",
     "type": "split",
     "children": [
       {
-        "id": "0860808c4fd97632",
+        "id": "9f4a6bbf58b59bbe",
         "type": "tabs",
         "children": [
           {
-            "id": "aee4b4e126ccb4b8",
+            "id": "ad23003152d0a045",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -48,7 +48,7 @@
             }
           },
           {
-            "id": "833033f6ff301f1b",
+            "id": "9b6414a33137e9b7",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -61,40 +61,40 @@
                 "sortOrder": "alphabetical"
               },
               "icon": "lucide-search",
-              "title": "Search"
+              "title": "검색"
             }
           },
           {
-            "id": "08dc10f87cd3d69d",
+            "id": "fc216311c4002e6e",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
               "state": {},
               "icon": "lucide-bookmark",
-              "title": "Bookmarks"
+              "title": "북마크"
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 294.5
+    "width": 300
   },
   "right": {
-    "id": "cffdedfc60098bb9",
+    "id": "0a1c19f9119df233",
     "type": "split",
     "children": [
       {
-        "id": "c96aed9447d33801",
+        "id": "b75aa5a3708c21dd",
         "type": "tabs",
         "children": [
           {
-            "id": "2615a4aef952f7ed",
+            "id": "59e1248bb9da9d5f",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "1. Project/가맹점 배치 성능 개선/01. Analysis.md",
+                "file": "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,25 +104,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "01. Analysis 의 백링크"
+              "title": "Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서 의 백링크"
             }
           },
           {
-            "id": "7878a944b2857c3a",
+            "id": "5317d58ad10f6dba",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "1. Project/가맹점 배치 성능 개선/01. Analysis.md",
+                "file": "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "01. Analysis 의 나가는 링크"
+              "title": "Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서 의 나가는 링크"
             }
           },
           {
-            "id": "fce4c754b9736ac1",
+            "id": "ed5783ecece8aa17",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -137,22 +137,22 @@
             }
           },
           {
-            "id": "5fd3eb0840c5626d",
+            "id": "527315e17c692074",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "1. Project/가맹점 배치 성능 개선/01. Analysis.md",
+                "file": "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "01. Analysis 의 개요"
+              "title": "Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서 의 개요"
             }
           },
           {
-            "id": "7cd9e90347036ab3",
+            "id": "dff5d9cbae9afb22",
             "type": "leaf",
             "state": {
               "type": "calendar",
@@ -160,23 +160,13 @@
               "icon": "calendar-with-checkmark",
               "title": "Calendar"
             }
-          },
-          {
-            "id": "053355abfe22ab7d",
-            "type": "leaf",
-            "state": {
-              "type": "git-history-view",
-              "state": {},
-              "icon": "history",
-              "title": "History"
-            }
           }
-        ],
-        "currentTab": 5
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 351.5
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -186,58 +176,16 @@
       "daily-notes:오늘의 일일 노트 열기": false,
       "templates:템플릿 삽입": false,
       "command-palette:명령어 팔레트 열기": false,
-      "obsidian-excalidraw-plugin:New drawing": false,
       "obsidian-git:Open Git source control": false,
+      "obsidian-excalidraw-plugin:New drawing": false,
       "periodic-notes:Open today": false
     }
   },
-  "active": "a665111ba3af5eeb",
+  "active": "d6b4b64312eecccb",
   "lastOpenFiles": [
-    "무제.md",
-    "1. Project/DMS 기부 서비스 고도화/20250514 환경 마일리지 기부 서비스.md",
-    "1. Project/DMS 기부 서비스 고도화/20250513 환경 마일리지 기부 서비스.md",
-    "Excalidraw/Drawing 2025-04-25 01.12.19.excalidraw.md",
-    "Excalidraw",
-    "2. Area/Interview/2025/moyo/Tech Interview.md",
-    "2. Area/Interview/2025/moyo",
-    "2. Area/Interview/2025/healingpaper/Code Review Interview.md",
-    "2. Area/Interview/2025/healingpaper",
-    "2. Area/Interview/2025/ab180/images/02_users-signin.png",
-    "2. Area/Interview/2025/ab180/images/03_users-signout.png",
-    "2. Area/Interview/2025/ab180/images/04_users_logs.png",
-    "2. Area/Interview/2025/ab180/images/05_admin-expire-tokens.png",
-    "2. Area/Interview/2025/ab180/images/01_users-signup.png",
-    "2. Area/Interview/2025/ab180/images",
-    "2. Area/Interview/2025/ab180/2. AB180 System Design.md",
-    "2. Area/Interview/2025/ab180/1. AB180 System Requirement.md",
-    "2. Area/Interview/2025/ab180",
-    "1. Project/DMS 기부 서비스 고도화",
-    "1. Project/Virtual Waiting Room 시스템 구축/02. System Architecture.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/회의/20250415 KTC 아키텍처 리뷰.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/02.01. System Design Prompt.md",
-    "1. Project/Virtual Waiting Room 시스템 구축/회의",
-    "1. Project/Virtual Waiting Room 시스템 구축/무제.md",
-    "1. Project/RSA 암호화 성능 개선/RSA 암호화 알고리즘 성능 측정.md",
-    "1. Project/RSA 암호화 성능 개선",
-    "1. Project/RCS 준준회원 가입/2025-03-25 RCS 준준회원 가입 관련 기획 리뷰.md",
-    "1. Project/RCS 준준회원 가입/2025-03-14 RCS 준준회원 가입 관련 회의.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 측정 결과.png",
-    "1. Project/가맹점 Batch 시스템 성능 개선/image/최종 성능 측정 결과.png",
-    "1. Project/가맹점 Batch 시스템 성능 개선/image",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/2차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/1차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring",
-    "1. Project/가맹점 Batch 시스템 성능 개선/00. Ready.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/3차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/5차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/1차 개선 사항.md",
-    "무제.canvas",
-    "Untitled 1.canvas",
-    "Untitled.canvas"
+    "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
+    "2. Area/Dev/DDD(Domain Driven Design)",
+    "2. Area/Dev",
+    "2. Area/무제.md"
   ]
 }
