@@ -1,24 +1,22 @@
 {
   "main": {
-    "id": "9810b580a383b4f0",
+    "id": "b170c7f26f3d45c8",
     "type": "split",
     "children": [
       {
-        "id": "26f5c3e38e31d516",
+        "id": "cff242702cb42ae6",
         "type": "tabs",
         "children": [
           {
-            "id": "d6b4b64312eecccb",
+            "id": "5ae73a65d50f91ec",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "excalidraw",
               "state": {
-                "file": "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
-                "mode": "source",
-                "source": false
+                "file": "2. Area/Interview/2025/29cm/Drawing 2025-05-26 22.51.31.excalidraw.md"
               },
-              "icon": "lucide-file",
-              "title": "Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서"
+              "icon": "excalidraw-icon",
+              "title": "Drawing 2025-05-26 22.51.31.excalidraw"
             }
           }
         ]
@@ -27,15 +25,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "130dcb9d96b3ee5e",
+    "id": "e562a712e6e6f2ec",
     "type": "split",
     "children": [
       {
-        "id": "9f4a6bbf58b59bbe",
+        "id": "d30240612f89ce49",
         "type": "tabs",
         "children": [
           {
-            "id": "ad23003152d0a045",
+            "id": "f4033ed7822f06b3",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -48,7 +46,7 @@
             }
           },
           {
-            "id": "9b6414a33137e9b7",
+            "id": "58b1b89f01a7d067",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -65,7 +63,7 @@
             }
           },
           {
-            "id": "fc216311c4002e6e",
+            "id": "72175ae6a458f1b9",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -81,48 +79,48 @@
     "width": 300
   },
   "right": {
-    "id": "0a1c19f9119df233",
+    "id": "ad5cbe0df6906fb2",
     "type": "split",
     "children": [
       {
-        "id": "b75aa5a3708c21dd",
+        "id": "1e5ea77fc565b873",
         "type": "tabs",
         "children": [
           {
-            "id": "59e1248bb9da9d5f",
+            "id": "34c778f875574d7a",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
+                "file": "2. Area/Interview/2025/29cm/Drawing 2025-05-26 22.51.31.excalidraw.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
-                "showSearch": false,
+                "showSearch": true,
                 "searchQuery": "",
                 "backlinkCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서 의 백링크"
+              "title": "Drawing 2025-05-26 22.51.31.excalidraw 의 백링크"
             }
           },
           {
-            "id": "5317d58ad10f6dba",
+            "id": "984738f96cd179d6",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
+                "file": "2. Area/Interview/2025/29cm/Drawing 2025-05-26 22.51.31.excalidraw.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서 의 나가는 링크"
+              "title": "Drawing 2025-05-26 22.51.31.excalidraw 의 나가는 링크"
             }
           },
           {
-            "id": "ed5783ecece8aa17",
+            "id": "26dd786ae6135eaa",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -137,22 +135,21 @@
             }
           },
           {
-            "id": "527315e17c692074",
+            "id": "b8370dd856106c8a",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서 의 개요"
+              "title": "개요"
             }
           },
           {
-            "id": "dff5d9cbae9afb22",
+            "id": "ca9e7830136c7bb1",
             "type": "leaf",
             "state": {
               "type": "calendar",
@@ -161,12 +158,12 @@
               "title": "Calendar"
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -181,11 +178,53 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "d6b4b64312eecccb",
+  "active": "26dd786ae6135eaa",
   "lastOpenFiles": [
+    "2. Area/Interview/2025/29cm/Drawing 2025-05-26 22.51.31.excalidraw.md",
+    "2. Area/Interview/2025/29cm",
+    "Excalidraw/Drawing 2025-04-25 01.12.19.excalidraw.md",
     "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
     "2. Area/Dev/DDD(Domain Driven Design)",
     "2. Area/Dev",
-    "2. Area/무제.md"
+    "1. Project/DMS 기부 서비스 고도화/20250514 환경 마일리지 기부 서비스.md",
+    "1. Project/DMS 기부 서비스 고도화/20250513 환경 마일리지 기부 서비스.md",
+    "1. Project/DMS 기부 서비스 고도화",
+    "2. Area/Interview/2025/ab180/1. AB180 System Requirement.md",
+    "2. Area/Interview/2025/ab180/2. AB180 System Design.md",
+    "2. Area/Interview/2025/ab180/images/01_users-signup.png",
+    "2. Area/Interview/2025/ab180/images/04_users_logs.png",
+    "2. Area/Interview/2025/ab180/images/05_admin-expire-tokens.png",
+    "2. Area/Interview/2025/ab180/images/04_logs.png",
+    "2. Area/Interview/2025/ab180/images/03_users-signout.png",
+    "2. Area/Interview/2025/ab180/images/02_users-signin.png",
+    "2. Area/Interview/2025/ab180/images",
+    "Excalidraw",
+    "2. Area/Interview/2025/ab180/무제.canvas",
+    "conflict-files-obsidian-git.md",
+    "2. Area/Interview/2025/ab180",
+    "1. Project/가맹점 Batch 시스템 성능 개선/image/최종 성능 측정 결과.png",
+    "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 측정 결과.png",
+    "1. Project/Virtual Waiting Room 시스템 구축/회의/20250415 KTC 아키텍처 리뷰.md",
+    "1. Project/Virtual Waiting Room 시스템 구축/회의",
+    "1. Project/Virtual Waiting Room 시스템 구축/02.01. System Design Prompt.md",
+    "1. Project/RSA 암호화 성능 개선/RSA 암호화 알고리즘 성능 측정.md",
+    "1. Project/RSA 암호화 성능 개선",
+    "1. Project/RCS 준준회원 가입/2025-03-25 RCS 준준회원 가입 관련 기획 리뷰.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/02. Result.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 변화.png",
+    "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/image",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/5차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/2차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/3차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/1차 개선.md",
+    "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
+    "Periodic Notes/1. Daily/2025-03-14.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/4차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/6차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/5차 개선.md",
+    "1. Project/가맹점 Batch 시스템 성능 개선/3차 개선.md"
   ]
 }
