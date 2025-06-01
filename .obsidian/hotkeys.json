@@ -63,5 +63,14 @@
       ],
       "key": "P"
     }
+  ],
+  "editor:rename-heading": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "S"
+    }
   ]
 }
