@@ -11,10 +11,14 @@
             "id": "a3d6f200cbb1c149",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "프로젝트 정리.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "새 탭"
+              "title": "프로젝트 정리"
             }
           }
         ]
@@ -155,16 +159,28 @@
               "icon": "calendar-with-checkmark",
               "title": "Calendar"
             }
+          },
+          {
+            "id": "50cba19e9ec8af83",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
+            }
           }
         ],
-        "currentTab": 2
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
+      "terminal:Open terminal": false,
       "switcher:빠른 전환기 열기": false,
       "graph:그래프 뷰 열기": false,
       "canvas:새 캔버스 만들기": false,
@@ -176,14 +192,16 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "f4033ed7822f06b3",
+  "active": "a3d6f200cbb1c149",
   "lastOpenFiles": [
+    "프로젝트 정리.md",
+    "Excalidraw/Drawing 2025-04-25 01.12.19.excalidraw.md",
+    "2. Area/Interview/2025/tossbank",
     "2. Area/Interview/2025/29cm/상품 주문 요청 Flow.md",
     "2. Area/Interview/2025/29cm/상품 주문 요청 API.md",
     "1. Project/Virtual Waiting Room 시스템 구축/회의/20250528 KTC API 리뷰 회의.md",
     "2. Area/Interview/2025/29cm/Drawing 2025-05-26 22.51.31.excalidraw.md",
     "2. Area/Interview/2025/29cm",
-    "Excalidraw/Drawing 2025-04-25 01.12.19.excalidraw.md",
     "2. Area/Dev/DDD(Domain Driven Design)/Toby Lee - 도메인 모델; 과거, 현재, 그리고 미래 개발자를 위한 안내서.md",
     "2. Area/Dev/DDD(Domain Driven Design)",
     "2. Area/Dev",
@@ -215,14 +233,12 @@
     "1. Project/가맹점 Batch 시스템 성능 개선/image/단계별 성능 변화.png",
     "1. Project/가맹점 Batch 시스템 성능 개선/01. Analysis.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/6차 개선.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/image",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/5차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/4차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/2차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/3차 개선.md",
     "1. Project/가맹점 Batch 시스템 성능 개선/Refactoring/1차 개선.md",
     "1. Project/Virtual Waiting Room 시스템 구축/01. System Requirement.md",
-    "Periodic Notes/1. Daily/2025-03-14.md",
-    "1. Project/가맹점 Batch 시스템 성능 개선/4차 개선.md"
+    "Periodic Notes/1. Daily/2025-03-14.md"
   ]
 }
