@@ -10,3 +10,7 @@ $ netstat -ano | findstr 6379
 # 프로세스 강제 Kill
 $ taskkill /F /PID <PID>
 ```
+
+```shell
+Get-NetTCPConnection -LocalPort 6379 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
