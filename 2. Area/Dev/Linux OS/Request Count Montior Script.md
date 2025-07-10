@@ -26,7 +26,7 @@
 ```
 
 ---
-#### Request/Minutes Count Script
+### Request/Minutes Count Script
 ##### `min-monitor.sh`
 ```bash
 #!/bin/bash
@@ -57,7 +57,7 @@ awk '
 '
 ```
 
-#### Request/Seconds Count Script
+### Request/Seconds Count Script
 ##### `sec-monitor.sh`
 ```bash
 #!/bin/bash
@@ -90,3 +90,42 @@ awk '
 ```
 
 ---
+### Request/Minutes Stats Command
+
+##### `min-stats.sh`
+```bash
+#!/bin/bash
+
+if [ -n "$1" ]; then
+  FILES=(~/log/*"$1"*)
+  if [ -e "${FILES[0]}" ]; then
+    LOG_FILE_LIST="${FILES[@]}"
+  else
+    LOG_FILE_LIST=~/log/cdisa.log
+  fi
+else
+  LOG_FILE_LIST=~/log/cdisa.log
+fi
+
+grep "\-RES" $LOG_FILE_LIST | awk -F' ' '{print $1, substr($2, 1, 5)}' | sort | uniq -c | awk '{count[$3]+=$1} END {for (key in count) print key "\t" count[key]}' | sort
+```
+
+### Request/Seconds Stats Command
+
+##### `sec-stats.sh`
+```bash
+#!/bin/bash
+
+if [ -n "$1" ]; then
+  FILES=(~/log/*"$1"*)
+  if [ -e "${FILES[0]}" ]; then
+    LOG_FILE_LIST="${FILES[@]}"
+  else
+    LOG_FILE_LIST=~/log/cdisa.log
+  fi
+else
+  LOG_FILE_LIST=~/log/cdisa.log
+fi
+
+grep "\-RES" $LOG_FILE_LIST | awk '{print $1, substr($2, 1, 8)}' | sort | uniq -c | awk '{count[$3]+=$1} END {for (key in count) print key "\t" count[key]}' | sort
+```
