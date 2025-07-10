@@ -26,12 +26,13 @@
 ```
 
 ---
-#### Request/Minuate Count Script
+#### Request/Minutes Count Script
 ##### `min-monitor.sh`
 ```bash
 #!/bin/bash
 
 LOG_FILE=~/log/cdisa.log
+
 tail -Fn0 "$LOG_FILE" | \
 awk '
   function print_count(min, overwrite) {
@@ -56,12 +57,13 @@ awk '
 '
 ```
 
-#### Request/Second Count Script
+#### Request/Seconds Count Script
 ##### `sec-monitor.sh`
 ```bash
 #!/bin/bash
 
 LOG_FILE=~/log/cdisa.log
+
 tail -Fn0 "$LOG_FILE" | \
 awk '
   function print_count(sec, overwrite) {
