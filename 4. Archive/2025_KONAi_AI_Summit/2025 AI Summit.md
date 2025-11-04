@@ -59,4 +59,6 @@
 
 - Ruls: Project Rules 에서 mdc 파일로 규칙 정의 가능
 - Commands: 사용자 정의 명령어를 별도 정의 가능
-- 
+
+---
+## Session.6
