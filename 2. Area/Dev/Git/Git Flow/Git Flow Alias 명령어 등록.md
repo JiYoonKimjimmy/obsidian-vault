@@ -10,6 +10,14 @@ alias push_git_branch='D:\\shell\\push_git_branch.sh'
 alias pull_git_branch='D:\\shell\\pull_git_branch.sh'
 ```
 
+## Git Flow 초기화
+
+```bash
+$ cd <project-directory>
+$ git flow init
+# Git Flow 초기화 진행
+```
+
 ## `git_flow_feature.sh`
 
 ```bash
