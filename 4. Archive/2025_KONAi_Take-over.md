@@ -5,9 +5,9 @@
 - [ ] DMS
 - [x] TSS
 - [x] KTC
-- [ ] TGS
-- [ ] Mock-Server
-- [ ] FXS
+- [x] TGS
+- [x] ~~Mock-Server~~
+- [x] ~~FXS~~
 
 ---
 
@@ -53,14 +53,5 @@
 ## TGS
 - [x] 기능 정의서 정리
 - [x] API 문서 정리
-
----
-## Mock-Server
-- [ ] API 문서 정리
-
----
-
-## FXS
-- [ ] API 문서 정리
 
 ---
