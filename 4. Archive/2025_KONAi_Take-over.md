@@ -2,7 +2,7 @@
 ## Take-over List
 
 - [x] MAP
-- [ ] DMS
+- [x] DMS
 - [x] TSS
 - [x] KTC
 - [x] TGS
