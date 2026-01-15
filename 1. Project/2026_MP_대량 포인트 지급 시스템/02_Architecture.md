@@ -6,7 +6,7 @@
 > 대량 포인트 지급 시스템의 아키텍처 설계 문서
 > - 요구 사항: [[01_Requirement]]
 
-### 아키텍처 선택: 하이브리드 방식 (Chunk + Partitioning)
+### 아키텍처 선택: Chunk + Partitioning 하이브리드 방식
 
 > [!tip] 선택 이유
 > - Outbox 테이블 100만 row 적재 부담 제거
@@ -15,12 +15,12 @@
 
 ### 아키텍처 비교
 
-| 방식 | 장점 | 단점 | 추천도 |
-|------|------|------|:------:|
-| Transactional Outbox | 데이터 일관성 보장, At-least-once | Outbox 테이블 관리 부담, Polling 오버헤드 | ⭐⭐⭐ |
-| Outbox + CDC (Debezium) | 실시간 이벤트 캡처 | 인프라 복잡도 증가 | ⭐⭐⭐⭐ |
-| 직접 Kafka 발행 | 단순함 | DB-Kafka 불일치 가능 | ⭐⭐ |
-| **하이브리드 (Chunk + Partitioning)** | Outbox 불필요, 직접 제어 가능 | 멱등성 필수 | ⭐⭐⭐⭐⭐ |
+| 방식                               | 장점                        | 단점                             |  추천도  |
+| -------------------------------- | ------------------------- | ------------------------------ | :---: |
+| Transactional Outbox             | 데이터 일관성 보장, At-least-once | Outbox 테이블 관리 부담, Polling 오버헤드 |  ⭐⭐⭐  |
+| Outbox + CDC (Debezium)          | 실시간 이벤트 캡처                | 인프라 복잡도 증가                     | ⭐⭐⭐⭐  |
+| 직접 Kafka 발행                      | 단순함                       | DB-Kafka 불일치 가능                |  ⭐⭐   |
+| **하이브리드 (Chunk + Partitioning)** | Outbox 불필요, 직접 제어 가능      | 멱등성 필수                         | ⭐⭐⭐⭐⭐ |
 
 ---
 
@@ -40,7 +40,7 @@ flowchart TB
     end
     
     subgraph DB["💾 Database"]
-        F[(payment_target<br/>+ publish_status)]
+        F[(payment_target<br/>+ partition_key<br/>+ publish_status)]
     end
     
     subgraph Kafka["📨 Kafka"]
@@ -56,19 +56,18 @@ flowchart TB
     
     subgraph Idempotency["🔐 멱등성 계층"]
         L[DB Unique Constraint]
-        M[Redis Distributed Lock]
     end
     
     subgraph External["🌐 External"]
-        N[money API]
+        M[money API]
     end
     
     A --> B & C & D & E
     F --> B & C & D & E
     B & C & D & E --> G
     G --> H & I & J & K
-    H & I & J & K --> L & M
-    L & M --> N
+    H & I & J & K --> L
+    L --> M
 ```
 
 ### 컴포넌트 역할
@@ -79,7 +78,7 @@ flowchart TB
 | **Publisher** | DB 조회 → Kafka 발행 | Multi-Worker 병렬 처리 |
 | **Kafka** | 메시지 브로커 | 파티션별 순서 보장 |
 | **Consumer** | 메시지 소비 → money API 호출 | Consumer Group |
-| **멱등성 계층** | 중복 처리 방지 | DB + Redis |
+| **멱등성 계층** | 중복 처리 방지 | DB Unique Constraint |
 
 ---
 
@@ -94,7 +93,6 @@ sequenceDiagram
     participant DB as Database
     participant K as Kafka
     participant C as Consumer
-    participant R as Redis
     participant M as money API
 
     S->>P: 캠페인 시작
@@ -110,19 +108,13 @@ sequenceDiagram
     C->>DB: 캠페인 상태 체크 (Cache 활용)
     
     alt 캠페인 상태 = 진행
-        C->>R: 분산 락 획득 시도
-        alt 락 획득 성공
-            C->>DB: INSERT payment_result (멱등성)
-            alt 신규 건
-                C->>M: 포인트 지급 요청<br/>(Idempotency-Key 헤더)
-                M-->>C: 지급 결과
-                C->>DB: UPDATE pay_status
-            else 이미 처리된 건
-                C->>C: Skip
-            end
-            C->>R: 락 해제
-        else 락 획득 실패
-            C->>C: Skip (다른 Consumer 처리 중)
+        C->>DB: INSERT payment_result (멱등성)
+        alt 신규 건
+            C->>M: 포인트 지급 요청
+            M-->>C: 지급 결과
+            C->>DB: UPDATE pay_status
+        else 이미 처리된 건 (DuplicateKey)
+            C->>C: Skip
         end
     else 캠페인 상태 ≠ 진행
         C->>C: 메시지 폐기
@@ -151,19 +143,114 @@ flowchart TB
 flowchart TB
     A[메시지 수신] --> B{캠페인 상태<br/>= 진행?}
     B -->|No| C[🚫 메시지 폐기]
-    B -->|Yes| D[Redis 분산 락<br/>획득 시도]
-    D --> E{락 획득<br/>성공?}
-    E -->|No| F[Skip<br/>다른 Consumer 처리 중]
-    E -->|Yes| G[payment_result<br/>INSERT 시도]
-    G --> H{DuplicateKey<br/>Exception?}
-    H -->|Yes| I[✅ Skip<br/>이미 처리됨]
-    H -->|No| J[money API 호출]
-    J --> K{지급 성공?}
-    K -->|Yes| L[status = SUCCESS]
-    K -->|No| M{재시도<br/>가능?}
-    M -->|Yes| N[retry_count++<br/>재시도]
-    M -->|No| O[status = FAILED]
-    L & I & O --> P[락 해제]
+    B -->|Yes| D[payment_result<br/>INSERT 시도]
+    D --> E{DuplicateKey<br/>Exception?}
+    E -->|Yes| F[✅ Skip<br/>이미 처리됨]
+    E -->|No| G[money API 호출]
+    G --> H{지급 성공?}
+    H -->|Yes| I[status = SUCCESS]
+    H -->|No| J{재시도<br/>가능?}
+    J -->|Yes| K[retry_count++<br/>재시도]
+    J -->|No| L[status = FAILED]
+```
+
+---
+
+## 📦 Kafka 메시지 구조
+
+### 메시지 설계 방식: Fat Message
+
+> [!note] Fat Message 선택 이유
+> - Consumer에서 DB 조회 불필요 (성능 향상)
+> - 발행 시점 데이터 고정 (감사 추적 용이)
+> - 메시지만으로 재처리 가능
+
+### 메시지 스키마
+
+```json
+{
+  "messageId": "550e8400-e29b-41d4-a716-446655440000",
+  "targetId": 12345,
+  "campaignId": "C001",
+  "memberId": "M12345",
+  "amount": 1000,
+  "reason": "신년 이벤트 포인트 지급",
+  "publishedAt": "2026-01-15T10:30:00Z"
+}
+```
+
+### 필드 설명
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `messageId` | UUID | 메시지 고유 식별자 |
+| `targetId` | Long | payment_target 테이블 PK |
+| `campaignId` | String | 캠페인 식별자 |
+| `memberId` | String | 회원 식별자 |
+| `amount` | Long | 지급 금액 |
+| `reason` | String | 지급 사유 |
+| `publishedAt` | ISO8601 | 발행 시각 |
+
+> [!tip] 멱등성 키는 메시지에 포함하지 않음
+> `campaign_id + member_id` 조합은 Consumer에서 직접 계산하며, DB Unique Constraint로 중복 처리 방지
+
+---
+
+## 🔑 Kafka 파티션 분배 전략
+
+### 파티션 키 설계
+
+> [!important] 파티션 키 = `campaign_id + member_id`
+> - 멱등성 키, DB Unique Key와 동일한 조합으로 **키 일관성** 확보
+> - 같은 캠페인+회원 메시지는 항상 같은 Consumer가 처리
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  🔑 키 일관성                                                  │
+├─────────────────────────────────────────────────────────────┤
+│  Kafka 파티션 키 : campaign_id + member_id (C001_M12345)      │
+│  멱등성 키       : campaign_id + member_id (C001_M12345) ✅   │
+│  DB Unique Key  : (campaign_id, member_id)             ✅   │
+│                                                             │
+│  → 모든 키가 동일한 조합으로 일관됨!                                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 파티션 분배 방식
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  📨 파티션 분배 (Kafka Producer 내부)                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  partition = hash("C001_M12345") % 4                        │
+│                                                             │
+│  예시 (파티션 4개):                                            │
+│  C001_M001 → hash % 4 = 1 → Partition 1                     │
+│  C001_M002 → hash % 4 = 3 → Partition 3                     │
+│  C001_M003 → hash % 4 = 0 → Partition 0                     │
+│  C002_M001 → hash % 4 = 2 → Partition 2 (다른 캠페인)          │
+│                                                             │
+│  ※ 파티션 수는 토픽 생성 시 정의 (예: 4개)                          │
+│  ※ 100만 건 메시지 → 4개 파티션에 균등 분산 (~25만 건씩)              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 향후 동시 캠페인 대응
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  📨 동시 캠페인 시나리오 (향후 확장 시)                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  [member_id만 사용 시]                                        │
+│  M12345 → Partition 1 (C001, C002 메시지 섞임)                 │
+│                                                             │
+│  [campaign_id + member_id 사용 시]                            │
+│  C001_M12345 → Partition 1                                  │
+│  C002_M12345 → Partition 3 (다른 파티션)                       │
+│  → 캠페인별 독립적 처리 가능                                      │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -177,7 +264,7 @@ flowchart TB
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  🔀 Partition 분배 (Worker 4개 기준)                         │
+│  🔀 Partition 분배 (Worker 4개 기준)                           │
 ├─────────────────────────────────────────────────────────────┤
 │  Worker 0: partition_key = 0  (약 25만 건)                   │
 │  Worker 1: partition_key = 1  (약 25만 건)                   │
@@ -188,12 +275,20 @@ flowchart TB
 
 ### 파티션 키 생성
 
-```sql
--- 데이터 적재 시 파티션 키 계산
--- member_id 기반 해시 → 균등 분배
-UPDATE payment_target 
-SET partition_key = MOD(ABS(CRC32(member_id)), 4)
-WHERE campaign_id = :campaignId;
+> [!tip] 선택: Option C (INSERT 시 계산)
+> - 파티션 수 변경 시 DDL 변경 없이 애플리케이션 설정만 수정
+> - 캠페인별 다른 파티션 수 적용 가능
+> - 상세 내용: [[#📎 부록: partition_key 생성 전략|부록: partition_key 생성 전략]] 참조
+
+```java
+// INSERT 시 partition_key 계산
+public void savePaymentTarget(PaymentTarget target, int partitionCount) {
+    String hashSource = target.getCampaignId() + target.getMemberId();
+    int partitionKey = Math.abs(hashSource.hashCode()) % partitionCount;
+    target.setPartitionKey(partitionKey);
+    
+    paymentTargetRepository.save(target);
+}
 ```
 
 ### Publisher 쿼리
@@ -214,51 +309,47 @@ SET publish_status = 'PUBLISHED',
 WHERE id IN (:publishedIds);
 ```
 
-### 대안: SELECT FOR UPDATE SKIP LOCKED
-
-> [!info] 동적 분배가 필요한 경우
-> 파티션 없이 DB 락으로 중복 조회 방지
-
-```sql
-BEGIN;
-
-SELECT * FROM payment_target 
-WHERE campaign_id = :campaignId 
-  AND publish_status = 'PENDING'
-ORDER BY id
-LIMIT 1000
-FOR UPDATE SKIP LOCKED;
-
--- 처리 후
-UPDATE payment_target 
-SET publish_status = 'PUBLISHED'
-WHERE id IN (:ids);
-
-COMMIT;
-```
-
-| 방식 | 장점 | 단점 |
-|------|------|------|
-| **파티셔닝** | DB 부하 낮음, 인덱스 효율적 | 사전 분배 필요 |
-| **SKIP LOCKED** | 동적 분배, 부하 균형 | DB 락 오버헤드 |
-
 ---
 
 ## 🔐 멱등성 보장 전략
 
-### 3중 보장 구조
+### 단일 계층 구조: DB Unique Constraint
+
+> [!note] 간소화 배경
+> - Kafka 파티션 키가 `campaign_id + member_id`이므로 같은 메시지는 **항상 같은 Consumer가 순서대로 처리**
+> - 파티션 내 순서 보장으로 동일 회원에 대한 동시 처리 불가
+> - **DB Unique Constraint 단일 계층으로 충분**
+> - 외부 서비스(money API) 의존성 제거로 결합도 감소
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  🔐 멱등성 3중 보장                                          │
+│  🔐 멱등성 보장 구조                                            │
 ├─────────────────────────────────────────────────────────────┤
-│  Layer 1: DB Unique Constraint (campaign_id + member_id)    │
-│  Layer 2: Redis Distributed Lock (선택적)                    │
-│  Layer 3: money API Idempotency-Key Header                  │
+│  DB Unique Constraint (campaign_id + member_id)             │
+│  → INSERT 시도 시 중복이면 DuplicateKeyException 발생            │
+│  → 예외 처리로 Skip 하여 멱등성 보장                               │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Layer 1: DB Unique Constraint
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ✅ 왜 단일 계층으로 충분한가?                                    │
+├─────────────────────────────────────────────────────────────┤
+│  1. Kafka 파티션 키 = campaign_id + member_id                 │
+│     → 같은 회원 메시지는 같은 파티션 → 같은 Consumer                │
+│     → 파티션 내 순서 보장으로 동시 처리 불가                         │
+│                                                             │
+│  2. DB Unique Constraint                                    │
+│     → Consumer 리밸런싱, 메시지 재발행 시에도 중복 방지              │
+│     → 어떤 예외 상황에서도 중복 INSERT 원천 차단                    │
+│                                                             │
+│  ※ 외부 API(money) Idempotency-Key 미사용                      │
+│     → money 서비스 스펙 변경에 영향받지 않음                        │
+│     → 내부 시스템에서 완결된 멱등성 보장                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### DB Unique Constraint 설계
 
 ```sql
 CREATE TABLE payment_result (
@@ -277,76 +368,63 @@ CREATE TABLE payment_result (
 );
 ```
 
-### Layer 2: Redis 분산 락
+### 처리 로직
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  🔒 Redis Lock 설계                                          │
+│  📥 Consumer 처리 흐름                                        │
 ├─────────────────────────────────────────────────────────────┤
-│  Key    : payment:{campaign_id}:{member_id}                  │
-│  Value  : {consumer_id}                                      │
-│  TTL    : 300s (5분)                                         │
-│  Command: SET key value NX EX 300                            │
+│                                                             │
+│  ┌─────────────┐                                            │
+│  │ 메시지 수신    │                                            │
+│  └──────┬──────┘                                            │
+│         ▼                                                   │
+│  ┌─────────────────┐    No    ┌──────────┐                  │
+│  │ 캠페인 상태 체크    │─────────→│ Skip     │                  │
+│  │ (캐시 활용)       │          │ 메시지폐기  │                  │
+│  └────────┬────────┘          └──────────┘                  │
+│           │ Yes                                             │
+│           ▼                                                 │
+│  ┌──────────────────────────┐                               │
+│  │ DB INSERT 시도            │                               │
+│  │ payment_result 테이블      │                               │
+│  │ (campaign_id, member_id) │                               │
+│  └────────┬─────────────────┘                               │
+│           │                                                 │
+│     ┌─────┴─────┐                                           │
+│     ▼           ▼                                           │
+│  ┌──────┐   ┌────────────────┐                              │
+│  │ 성공  │   │ DuplicateKey   │                              │
+│  └──┬───┘   │ Exception      │                              │
+│     │       └───────┬────────┘                              │
+│     │               ▼                                       │
+│     │       ┌──────────────┐                                │
+│     │       │ ✅ Skip      │                                │
+│     │       │ (이미 처리됨)   │                                │
+│     │       └──────────────┘                                │
+│     ▼                                                       │
+│  ┌─────────────────┐                                        │
+│  │ money API 호출   │                                        │
+│  │ 포인트 지급 요청    │                                        │
+│  └────────┬────────┘                                        │
+│           │                                                 │
+│     ┌─────┴─────┐                                           │
+│     ▼           ▼                                           │
+│  ┌──────┐   ┌──────────┐                                    │
+│  │ 성공  │   │ 실패      │                                    │
+│  └──┬───┘   └────┬─────┘                                    │
+│     │            ▼                                          │
+│     │       ┌──────────┐                                    │
+│     │       │ 재시도     │                                    │
+│     │       │ 처리      │                                    │
+│     │       └──────────┘                                    │
+│     ▼                                                       │
+│  ┌─────────────────────┐                                    │
+│  │ 결과 업데이트          │                                    │
+│  │ status = SUCCESS    │                                    │
+│  └─────────────────────┘                                    │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
-```
-
-### Layer 3: money API Idempotency-Key
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  🔑 Idempotency Key 설계                                     │
-├─────────────────────────────────────────────────────────────┤
-│  Header : Idempotency-Key                                    │
-│  Value  : {campaign_id}_{member_id}                          │
-│  예시   : "C001_M12345"                                      │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 처리 로직 (Pseudo Code)
-
-```java
-public void processPayment(PaymentMessage msg) {
-    String idempotencyKey = msg.getCampaignId() + "_" + msg.getMemberId();
-    
-    // 1. 캠페인 상태 체크 (캐시 활용)
-    if (!isCampaignRunning(msg.getCampaignId())) {
-        log.info("Campaign not running, skip: {}", msg.getCampaignId());
-        return;
-    }
-    
-    // 2. Redis 분산 락 획득 (선택적)
-    String lockKey = "payment:" + idempotencyKey;
-    if (!redisLock.tryLock(lockKey, Duration.ofMinutes(5))) {
-        log.info("Already processing: {}", idempotencyKey);
-        return;
-    }
-    
-    try {
-        // 3. DB INSERT 시도 (멱등성 체크)
-        PaymentResult result = PaymentResult.create(msg, "PROCESSING");
-        paymentResultRepository.insert(result);
-        
-        // 4. money API 호출 (Idempotency-Key 헤더)
-        MoneyResponse response = moneyClient.pay(
-            msg.getMemberId(),
-            msg.getAmount(),
-            idempotencyKey  // Idempotency-Key 헤더
-        );
-        
-        // 5. 결과 업데이트
-        result.complete(response);
-        paymentResultRepository.update(result);
-        
-    } catch (DuplicateKeyException e) {
-        log.info("Already processed: {}", idempotencyKey);
-        
-    } catch (MoneyApiException e) {
-        handleRetry(msg, e);
-        
-    } finally {
-        redisLock.unlock(lockKey);
-    }
-}
 ```
 
 ---
@@ -357,14 +435,13 @@ public void processPayment(PaymentMessage msg) {
 
 ```mermaid
 erDiagram
-    CAMPAIGN ||--o{ PAYMENT_TARGET : contains
-    CAMPAIGN ||--o{ PAYMENT_RESULT : produces
+    CAMPAIGN_PAYMENT_SUMMARY ||--o{ PAYMENT_TARGET : contains
+    CAMPAIGN_PAYMENT_SUMMARY ||--o{ PAYMENT_RESULT : produces
     PAYMENT_TARGET ||--o| PAYMENT_RESULT : generates
     
-    CAMPAIGN {
+    CAMPAIGN_PAYMENT_SUMMARY {
         bigint id PK
-        varchar campaign_id UK
-        varchar name
+        varchar campaign_id UK "원천 캠페인 참조"
         varchar status
         int total_count
         int success_count
@@ -372,6 +449,7 @@ erDiagram
         timestamp started_at
         timestamp completed_at
         timestamp created_at
+        timestamp updated_at
     }
     
     PAYMENT_TARGET {
@@ -404,11 +482,10 @@ erDiagram
 ### 테이블 DDL
 
 ```sql
--- 캠페인 테이블
-CREATE TABLE campaign (
+-- 캠페인 지급 현황 테이블
+CREATE TABLE campaign_payment_summary (
     id              BIGINT PRIMARY KEY AUTO_INCREMENT,
-    campaign_id     VARCHAR(50) NOT NULL UNIQUE,
-    name            VARCHAR(200) NOT NULL,
+    campaign_id     VARCHAR(50) NOT NULL UNIQUE,  -- 원천 캠페인 참조 키
     status          VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     total_count     INT DEFAULT 0,
     success_count   INT DEFAULT 0,
@@ -420,7 +497,7 @@ CREATE TABLE campaign (
     
     INDEX idx_status (status),
     INDEX idx_created (created_at)
-);
+) COMMENT '캠페인 지급 현황';
 
 -- 지급 대상 테이블
 CREATE TABLE payment_target (
@@ -460,7 +537,7 @@ CREATE TABLE payment_result (
 
 ### 상태 정의
 
-#### Campaign Status
+#### Campaign Payment Status (캠페인 지급 상태)
 
 | 상태 | 설명 |
 |:----:|------|
@@ -484,16 +561,34 @@ CREATE TABLE payment_result (
 
 ## 📈 예상 성능
 
+### Publisher vs Consumer 역할 구분
+
+| 컴포넌트 | 역할 | 병목 여부 |
+|----------|------|:--------:|
+| **Publisher** | DB 조회 → Kafka 발행 | ❌ 빠름 |
+| **Consumer** | Kafka 소비 → money API 호출 | ✅ **병목** |
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  🔄 처리 속도 비교                                           │
+├─────────────────────────────────────────────────────────────┤
+│  Publisher: DB 조회 + Kafka 발행 → 10,000+ msg/s 가능        │
+│  Consumer: money API 호출 → 1,000 TPS 제한 (병목)            │
+│                                                              │
+│  → Kafka가 속도 차이를 버퍼링!                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### 처리 시간 산정
 
-| 항목 | 값 |
-|------|---|
-| 전체 대상 | 1,000,000 건 |
-| Worker 수 | 4개 |
-| Worker당 처리량 | 250,000 건 |
-| money API TPS | 1,000 |
-| Worker당 TPS | 250 |
-| Worker당 처리 시간 | 250,000 / 250 = **1,000초 (약 17분)** |
+| 항목 | 값 | 설명 |
+|------|---|------|
+| 전체 대상 | 1,000,000 건 | |
+| Kafka 파티션 수 | 4개 | |
+| Consumer 수 | 4개 | 파티션당 1개 |
+| money API TPS | 1,000 | 전체 Consumer 합산 |
+| Consumer당 TPS | 250 | 1000 / 4 |
+| 처리 시간 | 1,000,000 / 1,000 = **1,000초 (약 17분)** | |
 
 > [!success] 예상 결과
 > 100만 건 처리 시간: **약 20분** (오버헤드 포함)
@@ -503,14 +598,36 @@ CREATE TABLE payment_result (
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  📊 Worker 수에 따른 처리 시간                               │
+│  📊 Consumer 수에 따른 처리 시간                                 │
 ├─────────────────────────────────────────────────────────────┤
-│  Worker 4개  : 약 20분                                       │
-│  Worker 8개  : 약 10분                                       │
-│  Worker 16개 : 약 5분                                        │
+│  Consumer 4개  (파티션 4개) : 약 20분                           │
+│  Consumer 8개  (파티션 8개) : 약 10분                           │
+│  Consumer 16개 (파티션 16개): 약 5분                            │
+│                                                             │
+│  ※ Consumer 수 ≤ Kafka 파티션 수 (중요!)                        │
+│  ※ money API TPS 제한(1000)이 최종 bottleneck                  │
+│  ※ money API TPS 증가 시 Consumer 확장으로 선형 성능 향상          |
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Consumer 스케일링 주의사항
+
+> [!warning] Consumer 수 ≤ Kafka 파티션 수
+> - 파티션 4개 → Consumer 최대 4개까지만 병렬 처리
+> - Consumer 5개 이상 배포해도 1개는 유휴 상태
+> - 더 많은 병렬 처리 필요 시 **파티션 수 증가 필요**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ⚠️ 파티션 < Consumer 인 경우                                │
+├─────────────────────────────────────────────────────────────┤
 │                                                              │
-│  ※ money API TPS 제한(1000)이 bottleneck                     │
-│  ※ TPS 증가 시 Worker 확장으로 선형 성능 향상 가능            │
+│  Kafka 파티션: 4개                                           │
+│  Consumer: 6개                                               │
+│                                                              │
+│  → Consumer 0~3: 각 파티션 담당 (활성)                       │
+│  → Consumer 4~5: 담당 파티션 없음 (유휴)                     │
+│                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -537,7 +654,6 @@ CREATE TABLE payment_result (
 | **Kafka 장애** | 메시지 손실 가능 | Kafka 클러스터 복구, PUBLISHED 상태 건 재발행 |
 | **money API 장애** | 지급 실패 | 재시도 3회 후 FAILED 마킹, 재처리 프로세스 |
 | **DB 장애** | 전체 중단 | DB 복구 후 재시작, 트랜잭션 롤백된 건 재처리 |
-| **Redis 장애** | 락 기능 상실 | DB Unique 제약으로 멱등성 보장 (성능 저하 가능) |
 
 ### 복구 프로세스
 
@@ -560,6 +676,273 @@ flowchart TB
     
     B -->|DB| M[DB 복구 대기]
     M --> N[시스템 재시작]
+```
+
+---
+
+## 📎 부록: Kafka 사용 이유
+
+> [!question] 왜 Kafka가 필요한가?
+> DB 파티셔닝만으로 병렬 처리가 가능한데, 왜 Publisher → Kafka → Consumer 구조를 사용하는가?
+
+### 핵심 이유
+
+| 이유 | 설명 |
+|------|------|
+| **비동기 처리** | Publisher는 API 응답을 기다리지 않고 계속 발행 가능 |
+| **버퍼링** | money API TPS 제한(1000)에 맞춰 Consumer가 조절 |
+| **장애 격리** | money API 장애 시에도 메시지는 Kafka에 안전하게 보관 |
+| **재처리** | Consumer offset 리셋으로 과거 메시지 재처리 가능 |
+| **독립 확장** | Publisher/Consumer를 독립적으로 스케일링 가능 |
+
+### 상세 분석
+
+#### 1. 비동기 처리 & 디커플링
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  🔗 Kafka 없이 (동기)                                        │
+├─────────────────────────────────────────────────────────────┤
+│  Worker → DB 조회 → money API (대기) → 다음 건 처리          │
+│  → money API 응답 대기 중 Worker가 블로킹됨                  │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  🔗 Kafka 사용 (비동기)                                      │
+├─────────────────────────────────────────────────────────────┤
+│  Publisher → DB 조회 → Kafka 발행 (즉시) → 다음 건           │
+│  Consumer → Kafka 소비 → money API 호출                      │
+│  → Publisher는 API 응답과 무관하게 빠르게 발행               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### 2. 버퍼링 & 백프레셔
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  📦 Kafka = 버퍼 역할                                        │
+├─────────────────────────────────────────────────────────────┤
+│  Publisher: 10,000 msg/s 발행 가능                           │
+│                    ↓                                         │
+│  [Kafka: 메시지 버퍼링] ← 100만 건 보관 가능                 │
+│                    ↓                                         │
+│  Consumer: 1,000 msg/s 처리 (money API 제한)                 │
+│                                                              │
+│  → 속도 차이를 Kafka가 흡수!                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### 3. 장애 격리 & 메시지 보존
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ⚠️ 시나리오: money API 30분 장애                            │
+├─────────────────────────────────────────────────────────────┤
+│  [Kafka 없이]                                                │
+│  Worker → money API 호출 실패 → 재시도 반복 → Worker 멈춤    │
+│                                                              │
+│  [Kafka 사용]                                                │
+│  Publisher → Kafka 발행 (정상 진행!)                         │
+│  Consumer → money API 호출 실패 → 재시도/대기                │
+│  → 메시지는 Kafka에 안전하게 보관                            │
+│  → 장애 복구 후 Consumer가 이어서 처리                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### 4. Kafka 없이 직접 구현 시 필요한 것들
+
+| Kafka가 제공하는 기능 | 직접 구현 시 |
+|---------------------|------------|
+| 메시지 버퍼링 | In-memory Queue 또는 DB Queue |
+| 장애 시 메시지 보존 | DB 상태 관리로 대체 |
+| Consumer 확장 | Worker 확장 + 파티션 관리 |
+| 재처리 (Replay) | DB 상태 기반 재조회 |
+| Rate Limiting | 자체 구현 (Resilience4j 등) |
+
+---
+
+## 📎 부록: partition_key 생성 전략
+
+### 배경
+
+Publisher가 파티션별로 데이터를 조회하려면 `partition_key` 컬럼이 필요합니다. 
+이 컬럼을 어떻게 생성할지에 대한 전략입니다.
+
+### 방식 비교
+
+| 구분 | 방식 | 적재 비용 | 조회 성능 | 권장도 |
+|------|------|:--------:|:--------:|:------:|
+| Option A | 별도 UPDATE | ❌ 높음 | ✅ 빠름 | ⭐⭐⭐ |
+| Option B | 조회 시 해시 계산 | ✅ 없음 | ❌ 느림 (Full Scan) | ⭐ |
+| **Option C** | **INSERT 시 계산** | ✅ 낮음 | ✅ 빠름 | ⭐⭐⭐⭐⭐ |
+| **Option D** | **Generated Column** | ✅ 없음 | ✅ 빠름 | ⭐⭐⭐⭐⭐ |
+
+> [!warning] 조회 시 해시 계산의 문제
+> `WHERE MOD(ABS(CRC32(...)), 4) = 0` 조건은 **인덱스를 활용할 수 없어** Full Table Scan 발생
+
+---
+
+### Option C: INSERT 시 partition_key 함께 저장 (권장)
+
+데이터 적재 시 partition_key를 애플리케이션에서 계산하여 함께 저장합니다.
+
+#### 테이블 정의
+
+```sql
+CREATE TABLE payment_target (
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT,
+    campaign_id     VARCHAR(50) NOT NULL,
+    member_id       VARCHAR(50) NOT NULL,
+    amount          BIGINT NOT NULL,
+    reason          VARCHAR(500),
+    partition_key   INT NOT NULL,  -- 애플리케이션에서 계산하여 저장
+    publish_status  VARCHAR(20) DEFAULT 'PENDING',
+    pay_status      VARCHAR(20) DEFAULT 'PENDING',
+    retry_count     INT DEFAULT 0,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_partition_publish (campaign_id, partition_key, publish_status)
+);
+```
+
+#### INSERT 코드 (Java)
+
+```java
+public void savePaymentTarget(PaymentTarget target, int partitionCount) {
+    // partition_key 계산
+    String hashSource = target.getCampaignId() + target.getMemberId();
+    int partitionKey = Math.abs(hashSource.hashCode()) % partitionCount;
+    target.setPartitionKey(partitionKey);
+    
+    paymentTargetRepository.save(target);
+}
+```
+
+#### INSERT SQL
+
+```sql
+INSERT INTO payment_target (campaign_id, member_id, amount, reason, partition_key)
+VALUES (
+    :campaignId, 
+    :memberId, 
+    :amount, 
+    :reason,
+    MOD(ABS(CRC32(CONCAT(:campaignId, :memberId))), 4)
+);
+```
+
+#### 장점
+
+- 별도 UPDATE 불필요
+- 인덱스 활용 가능
+- 데이터 적재 과정에서 자연스럽게 처리
+- 파티션 수 변경 시 유연하게 대응 가능
+
+---
+
+### Option D: Generated Column 사용
+
+MySQL 5.7+, PostgreSQL에서 지원하는 계산된 컬럼을 활용합니다.
+
+#### 테이블 정의 (MySQL)
+
+```sql
+CREATE TABLE payment_target (
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT,
+    campaign_id     VARCHAR(50) NOT NULL,
+    member_id       VARCHAR(50) NOT NULL,
+    amount          BIGINT NOT NULL,
+    reason          VARCHAR(500),
+    
+    -- Generated Column: INSERT 시 자동 계산됨
+    partition_key   INT GENERATED ALWAYS AS (
+        MOD(ABS(CRC32(CONCAT(campaign_id, member_id))), 4)
+    ) STORED,
+    
+    publish_status  VARCHAR(20) DEFAULT 'PENDING',
+    pay_status      VARCHAR(20) DEFAULT 'PENDING',
+    retry_count     INT DEFAULT 0,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_partition_publish (campaign_id, partition_key, publish_status)
+);
+```
+
+#### 테이블 정의 (PostgreSQL)
+
+```sql
+CREATE TABLE payment_target (
+    id              BIGSERIAL PRIMARY KEY,
+    campaign_id     VARCHAR(50) NOT NULL,
+    member_id       VARCHAR(50) NOT NULL,
+    amount          BIGINT NOT NULL,
+    reason          VARCHAR(500),
+    
+    -- Generated Column
+    partition_key   INT GENERATED ALWAYS AS (
+        MOD(ABS(HASHTEXT(campaign_id || member_id)), 4)
+    ) STORED,
+    
+    publish_status  VARCHAR(20) DEFAULT 'PENDING',
+    pay_status      VARCHAR(20) DEFAULT 'PENDING',
+    retry_count     INT DEFAULT 0,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_partition_publish ON payment_target (campaign_id, partition_key, publish_status);
+```
+
+#### INSERT (partition_key 명시 불필요)
+
+```sql
+-- partition_key는 자동 계산되므로 명시하지 않음
+INSERT INTO payment_target (campaign_id, member_id, amount, reason)
+VALUES (:campaignId, :memberId, :amount, :reason);
+```
+
+#### 장점
+
+- 데이터 INSERT 시 **자동 계산**
+- 애플리케이션 코드에서 partition_key 계산 로직 불필요
+- 인덱스 생성 가능 (`STORED` 옵션)
+- 데이터 무결성 보장 (DB 레벨에서 강제)
+
+#### 주의사항
+
+| 항목 | 설명 |
+|------|------|
+| `VIRTUAL` vs `STORED` | 인덱스에는 `STORED` 필수 |
+| 파티션 수 변경 | 컬럼 정의 변경 필요 (DDL) |
+| DB 버전 | MySQL 5.7+, PostgreSQL 11+ |
+
+---
+
+### 최종 선택: Option C (INSERT 시 계산)
+
+> [!success] 선택 이유
+> - 파티션 수 변경 시 DDL 변경 없이 애플리케이션 설정만 수정
+> - 캠페인별 다른 파티션 수 적용 가능 (유연성)
+> - 무중단 변경 가능
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  📋 Option C vs Option D 선택 기준                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  [Option C 선택 (본 시스템)]                                 │
+│  → 파티션 수 동적 변경 가능성이 있는 경우                    │
+│  → 캠페인별 다른 파티션 수 적용이 필요한 경우                │
+│  → DDL 변경 없이 운영하고 싶은 경우                          │
+│                                                              │
+│  [Option D 선택]                                             │
+│  → 파티션 수가 고정되어 변경 가능성이 낮은 경우              │
+│  → 애플리케이션 코드 단순화가 더 중요한 경우                 │
+│  → DB 레벨 데이터 무결성 강제가 필요한 경우                  │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
