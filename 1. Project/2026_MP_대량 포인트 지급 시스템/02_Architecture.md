@@ -40,7 +40,7 @@ flowchart TB
     end
     
     subgraph DB["💾 Database"]
-        F[(payment_target<br/>+ partition_key<br/>+ publish_status)]
+        F[(payment_target<br/>+ publish_status)]
     end
     
     subgraph Kafka["📨 Kafka"]
