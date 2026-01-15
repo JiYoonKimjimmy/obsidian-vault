@@ -94,6 +94,8 @@ sequenceDiagram
     participant K as Kafka
     participant C as Consumer
     participant M as money API
+    participant DLT as DLT Topic
+    participant RC as RetryConsumer
 
     S->>P: 캠페인 시작
     
@@ -111,13 +113,33 @@ sequenceDiagram
         C->>DB: INSERT payment_result (멱등성)
         alt 신규 건
             C->>M: 포인트 지급 요청
-            M-->>C: 지급 결과
-            C->>DB: UPDATE pay_status
+            alt 지급 성공
+                M-->>C: 성공 응답
+                C->>DB: UPDATE status=SUCCESS
+            else 지급 실패
+                M-->>C: 실패 응답
+                C->>DLT: DLT 발행 (retryCount++)
+            end
         else 이미 처리된 건 (DuplicateKey)
             C->>C: Skip
         end
     else 캠페인 상태 ≠ 진행
         C->>C: 메시지 폐기
+    end
+    
+    Note over DLT,RC: 재처리 흐름
+    DLT->>RC: 메시지 수신
+    RC->>RC: 지연 대기 (Exponential Backoff)
+    RC->>M: 포인트 지급 재시도
+    alt 재시도 성공
+        M-->>RC: 성공 응답
+        RC->>DB: UPDATE status=SUCCESS
+    else 재시도 실패 (retryCount < 5)
+        M-->>RC: 실패 응답
+        RC->>DLT: DLT 재발행
+    else 재시도 한도 초과 (retryCount >= 5)
+        M-->>RC: 실패 응답
+        RC->>DB: UPDATE status=PERMANENTLY_FAILED
     end
 ```
 
@@ -137,21 +159,36 @@ flowchart TB
     I -->|No| C
 ```
 
-### Consumer 처리 흐름
+### Consumer 처리 흐름 (PaymentConsumer)
 
 ```mermaid
 flowchart TB
-    A[메시지 수신] --> B{캠페인 상태<br/>= 진행?}
+    A[메시지 수신<br/>payment-request] --> B{캠페인 상태<br/>= 진행?}
     B -->|No| C[🚫 메시지 폐기]
     B -->|Yes| D[payment_result<br/>INSERT 시도]
     D --> E{DuplicateKey<br/>Exception?}
     E -->|Yes| F[✅ Skip<br/>이미 처리됨]
     E -->|No| G[money API 호출]
     G --> H{지급 성공?}
-    H -->|Yes| I[status = SUCCESS]
-    H -->|No| J{재시도<br/>가능?}
-    J -->|Yes| K[retry_count++<br/>재시도]
-    J -->|No| L[status = FAILED]
+    H -->|Yes| I[✅ status = SUCCESS]
+    H -->|No| J[retryCount++<br/>errorMessage 설정]
+    J --> K[📤 DLT 발행<br/>payment-request.DLT]
+```
+
+### RetryConsumer 처리 흐름
+
+```mermaid
+flowchart TB
+    A[메시지 수신<br/>payment-request.DLT] --> B[지연 대기<br/>Exponential Backoff]
+    B --> C[money API 재호출]
+    C --> D{지급 성공?}
+    D -->|Yes| E[✅ status = SUCCESS]
+    D -->|No| F{retryCount < 5?}
+    F -->|Yes| G[retryCount++]
+    G --> H[📤 DLT 재발행<br/>payment-request.DLT]
+    F -->|No| I[🚨 Final DLT 발행<br/>payment-request.DLT.FINAL]
+    I --> J[status = PERMANENTLY_FAILED]
+    J --> K[알림 발송]
 ```
 
 ---
