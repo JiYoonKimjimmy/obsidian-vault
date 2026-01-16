@@ -148,7 +148,7 @@ sequenceDiagram
                 M-->>C: 실패 응답
                 C->>DB: UPDATE status=FAILED
                 C->>DLT: DLT 발행 (retryCount++)
-                C->>R: 포인트 지급 '실패' 카운트 업데이트
+                Note right of C: 아직 최종 실패 아님 (재시도 대상)
             end
         else 이미 처리된 건 (DuplicateKey)
             C->>C: Skip
@@ -163,14 +163,15 @@ sequenceDiagram
     RC->>M: 포인트 지급 재시도
     alt 재시도 성공
         M-->>RC: 성공 응답
-        RC->>DB: UPDATE status=SUCCESS
-        RC->>R: 포인트 지급 '성공' 카운트 업데이트
+        RC->>DB: UPDATE status=SUCCESS (FAILED → SUCCESS)
+        RC->>R: 카운트 업데이트 (success+1, retry_success+1)
     else 재시도 실패 (retryCount < 5)
         M-->>RC: 실패 응답
         RC->>DLT: DLT 재발행
     else 재시도 한도 초과 (retryCount >= 5)
         M-->>RC: 실패 응답
         RC->>DB: UPDATE status=PERMANENTLY_FAILED
+        RC->>R: 포인트 지급 '실패(최종)' 카운트 업데이트
     end
 ```
 
