@@ -248,6 +248,7 @@ flowchart TB
   "memberId": "M12345",
   "amount": 1000,
   "reason": "신년 이벤트 포인트 지급",
+  "expiryAt": "2026-03-31T23:59:59Z",
   "publishedAt": "2026-01-15T10:30:00Z"
 }
 ```
@@ -257,15 +258,16 @@ flowchart TB
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `messageId` | UUID | 메시지 고유 식별자 |
-| `targetId` | Long | payment_target 테이블 PK |
+| `targetId` | Long | payment_target 테이블 PK (멱등성 키) |
 | `campaignId` | String | 캠페인 식별자 |
 | `memberId` | String | 회원 식별자 |
 | `amount` | Long | 지급 금액 |
 | `reason` | String | 지급 사유 |
+| `expiryAt` | ISO8601 | 포인트/상품권 만료 일시 |
 | `publishedAt` | ISO8601 | 발행 시각 |
 
-> [!tip] 멱등성 키는 메시지에 포함하지 않음
-> `campaign_id + member_id` 조합은 Consumer에서 직접 계산하며, DB Unique Constraint로 중복 처리 방지
+> [!tip] 멱등성 키
+> `targetId`를 멱등성 키로 사용하며, DB Unique Constraint(`payment_result.target_id`)로 중복 처리 방지
 
 ---
 
@@ -485,7 +487,7 @@ WHERE id IN (:publishedIds);
 ┌─────────────────────────────────────────────────────────────┐
 │  🔐 멱등성 보장 구조                                            │
 ├─────────────────────────────────────────────────────────────┤
-│  DB Unique Constraint (campaign_id + member_id)             │
+│  DB Unique Constraint (target_id)                           │
 │  → INSERT 시도 시 중복이면 DuplicateKeyException 발생            │
 │  → 예외 처리로 Skip 하여 멱등성 보장                               │
 └─────────────────────────────────────────────────────────────┘
@@ -501,9 +503,10 @@ WHERE id IN (:publishedIds);
 │     → 같은 회원 메시지는 같은 파티션 → 같은 Consumer               │
 │     → 파티션 내 순서 보장으로 동시 처리 불가                         │
 │                                                             │
-│  2. DB Unique Constraint                                    │
+│  2. DB Unique Constraint (target_id)                        │
 │     → Consumer 리밸런싱, 메시지 재발행 시에도 중복 방지              │
 │     → 어떤 예외 상황에서도 중복 INSERT 원천 차단                    │
+│     → target 당 1개의 result만 생성 보장                        │
 │                                                             │
 │  ※ 외부 API(money) Idempotency-Key 미사용                      │
 │     → money 서비스 스펙 변경에 영향받지 않음                        │
@@ -515,18 +518,18 @@ WHERE id IN (:publishedIds);
 
 ```sql
 CREATE TABLE payment_result (
-    id              BIGINT PRIMARY KEY AUTO_INCREMENT,
-    campaign_id     VARCHAR(50) NOT NULL,
-    member_id       VARCHAR(50) NOT NULL,
-    amount          BIGINT NOT NULL,
-    status          VARCHAR(20) NOT NULL,
-    money_tx_id     VARCHAR(100),
-    error_message   VARCHAR(500),
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    target_id     BIGINT NOT NULL COMMENT 'payment_target.id 참조',
+    status        VARCHAR(20) NOT NULL,
+    money_tx_id   VARCHAR(100),
+    error_message VARCHAR(500),
+    retry_count   INT NOT NULL DEFAULT 0,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    -- 멱등성 보장
-    UNIQUE KEY uk_idempotency (campaign_id, member_id)
+    -- 멱등성 보장 (target 당 1개 결과)
+    UNIQUE KEY uk_target (target_id),
+    CONSTRAINT fk_result_target FOREIGN KEY (target_id) REFERENCES payment_target(id)
 );
 ```
 
@@ -550,7 +553,7 @@ CREATE TABLE payment_result (
 │  ┌──────────────────────────┐                               │
 │  │ DB INSERT 시도            │                               │
 │  │ payment_result 테이블      │                               │
-│  │ (campaign_id, member_id) │                               │
+│  │ (target_id)              │                               │
 │  └────────┬─────────────────┘                               │
 │           │                                                 │
 │     ┌─────┴─────┐                                           │
@@ -600,8 +603,7 @@ CREATE TABLE payment_result (
 ```mermaid
 erDiagram
     CAMPAIGN_PAYMENT_SUMMARY ||--o{ PAYMENT_TARGET : contains
-    CAMPAIGN_PAYMENT_SUMMARY ||--o{ PAYMENT_RESULT : produces
-    PAYMENT_TARGET ||--o| PAYMENT_RESULT : generates
+    PAYMENT_TARGET ||--o| PAYMENT_RESULT : has_result
     
     CAMPAIGN_PAYMENT_SUMMARY {
         bigint id PK
@@ -622,22 +624,20 @@ erDiagram
         varchar member_id
         bigint amount
         varchar reason
+        timestamp expiry_at "만료 일시"
         int partition_key
         varchar publish_status
-        varchar pay_status
-        int retry_count
         timestamp created_at
         timestamp updated_at
     }
     
     PAYMENT_RESULT {
         bigint id PK
-        varchar campaign_id FK
-        varchar member_id UK
-        bigint amount
+        bigint target_id FK_UK "멱등성 키"
         varchar status
         varchar money_tx_id
         varchar error_message
+        int retry_count
         timestamp created_at
         timestamp updated_at
     }
@@ -670,32 +670,29 @@ CREATE TABLE payment_target (
     member_id       VARCHAR(50) NOT NULL,
     amount          BIGINT NOT NULL,
     reason          VARCHAR(500),
+    expiry_at       TIMESTAMP NULL COMMENT '만료 일시',
     partition_key   INT NOT NULL,
     publish_status  VARCHAR(20) DEFAULT 'PENDING',
-    pay_status      VARCHAR(20) DEFAULT 'PENDING',
-    retry_count     INT DEFAULT 0,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    INDEX idx_partition_publish (campaign_id, partition_key, publish_status),
-    INDEX idx_pay_status (campaign_id, pay_status),
-    INDEX idx_retry (campaign_id, pay_status, retry_count)
+    INDEX idx_partition_publish (campaign_id, partition_key, publish_status)
 );
 
 -- 지급 결과 테이블
 CREATE TABLE payment_result (
-    id              BIGINT PRIMARY KEY AUTO_INCREMENT,
-    campaign_id     VARCHAR(50) NOT NULL,
-    member_id       VARCHAR(50) NOT NULL,
-    amount          BIGINT NOT NULL,
-    status          VARCHAR(20) NOT NULL,
-    money_tx_id     VARCHAR(100),
-    error_message   VARCHAR(500),
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    target_id     BIGINT NOT NULL COMMENT 'payment_target.id 참조',
+    status        VARCHAR(20) NOT NULL,
+    money_tx_id   VARCHAR(100),
+    error_message VARCHAR(500),
+    retry_count   INT NOT NULL DEFAULT 0,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    UNIQUE KEY uk_idempotency (campaign_id, member_id),
-    INDEX idx_status (campaign_id, status)
+    UNIQUE KEY uk_target (target_id),
+    INDEX idx_status (status),
+    CONSTRAINT fk_result_target FOREIGN KEY (target_id) REFERENCES payment_target(id)
 );
 ```
 

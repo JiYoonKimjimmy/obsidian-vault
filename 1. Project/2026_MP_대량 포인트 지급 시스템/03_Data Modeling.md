@@ -9,8 +9,8 @@
 | `campaign_event_summary` | 이벤트 처리 현황 |
 
 ### 포인트 지급 도메인
-| 테이블 | 설명 |
-|--------|------|
+| 테이블             | 설명        |
+| --------------- | --------- |
 | `point_targets` | 포인트 지급 대상 |
 | `point_results` | 포인트 지급 결과 |
 
@@ -29,8 +29,8 @@ erDiagram
     campaign_events ||--|| campaign_event_summary : has
     campaign_events ||--o{ point_targets : contains
     campaign_events ||--o{ voucher_targets : contains
-    point_targets ||--o| point_results : generates
-    voucher_targets ||--o| voucher_results : generates
+    point_targets ||--o| point_results : has_result
+    voucher_targets ||--o| voucher_results : has_result
     
     campaign_events {
         id bigint PK
@@ -39,7 +39,7 @@ erDiagram
         event_status varchar
         default_reason varchar
         default_amount bigint
-        expiry_at timestamp
+        default_expiry_at timestamp
         total_count int
         total_amount bigint
         partition_count int
@@ -71,6 +71,7 @@ erDiagram
         member_id varchar
         amount bigint
         reason varchar
+        expiry_at timestamp
         partition_key int
         publish_status varchar
         created_at timestamp
@@ -79,9 +80,7 @@ erDiagram
     
     point_results {
         id bigint PK
-        event_id bigint FK
-        member_id varchar UK
-        amount bigint
+        target_id bigint FK "UK"
         status varchar
         money_tx_id varchar
         error_message varchar
@@ -96,6 +95,7 @@ erDiagram
         member_id varchar
         amount bigint
         reason varchar
+        expiry_at timestamp
         partition_key int
         publish_status varchar
         created_at timestamp
@@ -104,14 +104,9 @@ erDiagram
     
     voucher_results {
         id bigint PK
-        event_id bigint FK
-        member_id varchar UK
-        amount bigint
+        target_id bigint FK "UK"
         status varchar
         money_tx_id varchar
-        voucher_code varchar
-        voucher_pin varchar
-        voucher_expiry_at timestamp
         error_message varchar
         retry_count int
         created_at timestamp
@@ -123,7 +118,7 @@ erDiagram
 
 ## 📝 테이블 상세 정의
 
-### 1️⃣ `campaign_events` (캠페인 이벤트 메타)
+### 1️⃣ `campaign_events` (캠페인 이벤트 목록)
 
 > 캠페인 이벤트에 대한 정의/설정 정보를 저장하는 메타 테이블
 
@@ -158,7 +153,7 @@ erDiagram
 | `event_status` | VARCHAR(20) | NO | 이벤트 상태 |
 | `default_reason` | VARCHAR(500) | YES | 공통 사유 |
 | `default_amount` | BIGINT | YES | 기본 금액 |
-| `expiry_at` | TIMESTAMP | YES | 만료 일시 (포인트/상품권) |
+| `default_expiry_at` | TIMESTAMP | YES | 기본 만료 일시 (포인트/상품권) |
 | `total_count` | INT | NO | 전체 대상 건수 |
 | `total_amount` | BIGINT | NO | 전체 금액 |
 | `partition_count` | INT | NO | 병렬 처리 파티션 수 (기본값: 4) |
@@ -178,7 +173,7 @@ CREATE TABLE campaign_events (
     event_status         VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     default_reason       VARCHAR(500) NULL COMMENT '공통 사유',
     default_amount       BIGINT NULL COMMENT '기본 금액',
-    expiry_at            TIMESTAMP NULL COMMENT '만료 일시',
+    default_expiry_at    TIMESTAMP NULL COMMENT '기본 만료 일시',
     total_count          INT NOT NULL DEFAULT 0,
     total_amount         BIGINT NOT NULL DEFAULT 0,
     partition_count      INT NOT NULL DEFAULT 4 COMMENT '병렬 처리 파티션 수',
@@ -257,6 +252,7 @@ CREATE TABLE campaign_event_summary (
 #### 요구 사항
 - 포인트 지급 대상 회원 정보 관리
 - 건별 지급 금액 및 사유 관리
+- 포인트 만료 일시 관리 (메시지 발행 시 포함)
 - 병렬 처리를 위한 파티션 키 관리
 - Kafka 발행 상태 관리
 
@@ -269,6 +265,7 @@ CREATE TABLE campaign_event_summary (
 | `member_id` | VARCHAR(50) | NO | 회원 ID |
 | `amount` | BIGINT | NO | 지급 금액 |
 | `reason` | VARCHAR(500) | YES | 개별 사유 (NULL이면 default_reason 사용) |
+| `expiry_at` | TIMESTAMP | YES | 포인트 만료 일시 |
 | `partition_key` | INT | NO | 파티션 키 (0 ~ partition_count-1) |
 | `publish_status` | VARCHAR(20) | NO | 발행 상태 (`PENDING` / `PUBLISHED`) |
 | `created_at` | TIMESTAMP | NO | 생성 일시 |
@@ -283,6 +280,7 @@ CREATE TABLE point_targets (
     member_id      VARCHAR(50) NOT NULL COMMENT '회원 ID',
     amount         BIGINT NOT NULL COMMENT '지급 금액',
     reason         VARCHAR(500) NULL COMMENT '개별 사유',
+    expiry_at      TIMESTAMP NULL COMMENT '포인트 만료 일시',
     partition_key  INT NOT NULL COMMENT '파티션 키',
     publish_status VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / PUBLISHED',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -301,6 +299,7 @@ CREATE TABLE point_targets (
 > 포인트 지급 처리 결과를 저장하는 테이블 (멱등성 보장)
 
 #### 요구 사항
+- target 참조를 통한 정규화 (중복 데이터 제거)
 - 지급 처리 결과 상태 관리
 - money 시스템 트랜잭션 ID 저장
 - 실패 시 에러 메시지 저장
@@ -311,9 +310,7 @@ CREATE TABLE point_targets (
 | Column | Type | Nullable | Description |
 |--------|------|:--------:|-------------|
 | `id` | BIGINT | NO | 결과 ID (PK, AUTO_INCREMENT) |
-| `event_id` | BIGINT | NO | campaign_events.id (FK) |
-| `member_id` | VARCHAR(50) | NO | 회원 ID |
-| `amount` | BIGINT | NO | 지급 금액 |
+| `target_id` | BIGINT | NO | point_targets.id (FK, UK) - 멱등성 키 |
 | `status` | VARCHAR(20) | NO | 처리 상태 |
 | `money_tx_id` | VARCHAR(100) | YES | money 트랜잭션 ID |
 | `error_message` | VARCHAR(500) | YES | 에러 메시지 |
@@ -335,9 +332,7 @@ CREATE TABLE point_targets (
 ```sql
 CREATE TABLE point_results (
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
-    event_id      BIGINT NOT NULL COMMENT 'campaign_events.id 참조',
-    member_id     VARCHAR(50) NOT NULL COMMENT '회원 ID',
-    amount        BIGINT NOT NULL COMMENT '지급 금액',
+    target_id     BIGINT NOT NULL COMMENT 'point_targets.id 참조',
     status        VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     money_tx_id   VARCHAR(100) NULL COMMENT 'money 시스템 트랜잭션 ID',
     error_message VARCHAR(500) NULL COMMENT '에러 메시지',
@@ -345,9 +340,9 @@ CREATE TABLE point_results (
     created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    UNIQUE KEY uk_idempotency (event_id, member_id),
-    INDEX idx_status (event_id, status),
-    CONSTRAINT fk_point_result_event FOREIGN KEY (event_id) REFERENCES campaign_events(id)
+    UNIQUE KEY uk_target (target_id),
+    INDEX idx_status (status),
+    CONSTRAINT fk_point_result_target FOREIGN KEY (target_id) REFERENCES point_targets(id)
 ) COMMENT '포인트 지급 결과';
 ```
 
@@ -360,6 +355,7 @@ CREATE TABLE point_results (
 #### 요구 사항
 - 상품권 발행 대상 회원 정보 관리
 - 건별 발행 금액 및 사유 관리
+- 상품권 만료 일시 관리 (메시지 발행 시 포함)
 - 병렬 처리를 위한 파티션 키 관리
 - Kafka 발행 상태 관리
 
@@ -372,6 +368,7 @@ CREATE TABLE point_results (
 | `member_id` | VARCHAR(50) | NO | 회원 ID |
 | `amount` | BIGINT | NO | 발행 금액 |
 | `reason` | VARCHAR(500) | YES | 개별 사유 (NULL이면 default_reason 사용) |
+| `expiry_at` | TIMESTAMP | YES | 상품권 만료 일시 |
 | `partition_key` | INT | NO | 파티션 키 (0 ~ partition_count-1) |
 | `publish_status` | VARCHAR(20) | NO | 발행 상태 (`PENDING` / `PUBLISHED`) |
 | `created_at` | TIMESTAMP | NO | 생성 일시 |
@@ -386,6 +383,7 @@ CREATE TABLE voucher_targets (
     member_id      VARCHAR(50) NOT NULL COMMENT '회원 ID',
     amount         BIGINT NOT NULL COMMENT '발행 금액',
     reason         VARCHAR(500) NULL COMMENT '개별 사유',
+    expiry_at      TIMESTAMP NULL COMMENT '상품권 만료 일시',
     partition_key  INT NOT NULL COMMENT '파티션 키',
     publish_status VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / PUBLISHED',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -404,6 +402,7 @@ CREATE TABLE voucher_targets (
 > 상품권 발행 처리 결과를 저장하는 테이블 (멱등성 보장)
 
 #### 요구 사항
+- target 참조를 통한 정규화 (중복 데이터 제거)
 - 발행 처리 결과 상태 관리
 - money 시스템 트랜잭션 ID 저장
 - 상품권 코드, PIN, 만료일 저장
@@ -415,14 +414,12 @@ CREATE TABLE voucher_targets (
 | Column | Type | Nullable | Description |
 |--------|------|:--------:|-------------|
 | `id` | BIGINT | NO | 결과 ID (PK, AUTO_INCREMENT) |
-| `event_id` | BIGINT | NO | campaign_events.id (FK) |
-| `member_id` | VARCHAR(50) | NO | 회원 ID |
-| `amount` | BIGINT | NO | 발행 금액 |
+| `target_id` | BIGINT | NO | voucher_targets.id (FK, UK) - 멱등성 키 |
 | `status` | VARCHAR(20) | NO | 처리 상태 |
 | `money_tx_id` | VARCHAR(100) | YES | money 트랜잭션 ID |
 | `voucher_code` | VARCHAR(50) | YES | 상품권 코드 |
 | `voucher_pin` | VARCHAR(20) | YES | 상품권 PIN |
-| `voucher_expiry_at` | TIMESTAMP | YES | 상품권 만료 일시 |
+| `voucher_expiry_at` | TIMESTAMP | YES | 상품권 만료 일시 (발행 시 반환값) |
 | `error_message` | VARCHAR(500) | YES | 에러 메시지 |
 | `retry_count` | INT | NO | 재시도 횟수 |
 | `created_at` | TIMESTAMP | NO | 생성 일시 |
@@ -442,22 +439,20 @@ CREATE TABLE voucher_targets (
 ```sql
 CREATE TABLE voucher_results (
     id                BIGINT PRIMARY KEY AUTO_INCREMENT,
-    event_id          BIGINT NOT NULL COMMENT 'campaign_events.id 참조',
-    member_id         VARCHAR(50) NOT NULL COMMENT '회원 ID',
-    amount            BIGINT NOT NULL COMMENT '발행 금액',
+    target_id         BIGINT NOT NULL COMMENT 'voucher_targets.id 참조',
     status            VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     money_tx_id       VARCHAR(100) NULL COMMENT 'money 시스템 트랜잭션 ID',
     voucher_code      VARCHAR(50) NULL COMMENT '상품권 코드',
     voucher_pin       VARCHAR(20) NULL COMMENT '상품권 PIN',
-    voucher_expiry_at TIMESTAMP NULL COMMENT '상품권 만료 일시',
+    voucher_expiry_at TIMESTAMP NULL COMMENT '상품권 만료 일시 (발행 시 반환값)',
     error_message     VARCHAR(500) NULL COMMENT '에러 메시지',
     retry_count       INT NOT NULL DEFAULT 0 COMMENT '재시도 횟수',
     created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    UNIQUE KEY uk_idempotency (event_id, member_id),
-    INDEX idx_status (event_id, status),
-    CONSTRAINT fk_voucher_result_event FOREIGN KEY (event_id) REFERENCES campaign_events(id)
+    UNIQUE KEY uk_target (target_id),
+    INDEX idx_status (status),
+    CONSTRAINT fk_voucher_result_target FOREIGN KEY (target_id) REFERENCES voucher_targets(id)
 ) COMMENT '상품권 발행 결과';
 ```
 
