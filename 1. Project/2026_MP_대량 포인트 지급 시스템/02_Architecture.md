@@ -126,7 +126,7 @@ sequenceDiagram
     S->>R: 포인트 지급 '전체' 카운트 업데이트
     
     loop Chunk 단위 처리 (1000건씩)
-        P->>DB: SELECT (partition_key=N, publish_status=PENDING)<br/>LIMIT 1000
+        P->>DB: SELECT (partition_key=N, publish_status=PENDING, is_blocked=0)<br/>LIMIT 1000
         DB-->>P: 지급 대상 목록
         P->>K: Batch 메시지 발행
         P->>DB: UPDATE publish_status=PUBLISHED
@@ -181,7 +181,7 @@ sequenceDiagram
 flowchart TB
     A[캠페인 시작] --> B{캠페인 상태<br/>= 진행?}
     B -->|No| C[종료]
-    B -->|Yes| D[담당 파티션 조회<br/>PENDING 상태 1000건]
+    B -->|Yes| D[담당 파티션 조회<br/>PENDING and is_blocked=0<br/>1000건]
     D --> E{데이터<br/>존재?}
     E -->|No| F[완료 처리]
     E -->|Yes| G[Kafka Batch 발행]
@@ -461,6 +461,7 @@ SELECT * FROM payment_target
 WHERE campaign_id = :campaignId 
   AND partition_key = 0
   AND publish_status = 'PENDING'
+  AND is_blocked = 0
 ORDER BY id
 LIMIT 1000;
 
@@ -627,6 +628,7 @@ erDiagram
         timestamp expiry_at "만료 일시"
         int partition_key
         varchar publish_status
+        tinyint is_blocked "차단 여부"
         timestamp created_at
         timestamp updated_at
     }
@@ -673,10 +675,11 @@ CREATE TABLE payment_target (
     expiry_at       TIMESTAMP NULL COMMENT '만료 일시',
     partition_key   INT NOT NULL,
     publish_status  VARCHAR(20) DEFAULT 'PENDING',
+    is_blocked      TINYINT(1) NOT NULL DEFAULT 0 COMMENT '차단 여부',
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    INDEX idx_partition_publish (campaign_id, partition_key, publish_status)
+    INDEX idx_partition_publish (campaign_id, partition_key, publish_status, is_blocked)
 );
 
 -- 지급 결과 테이블

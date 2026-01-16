@@ -74,6 +74,7 @@ erDiagram
         expiry_at timestamp
         partition_key int
         publish_status varchar
+        is_blocked tinyint
         created_at timestamp
         updated_at timestamp
     }
@@ -98,6 +99,7 @@ erDiagram
         expiry_at timestamp
         partition_key int
         publish_status varchar
+        is_blocked tinyint
         created_at timestamp
         updated_at timestamp
     }
@@ -255,6 +257,7 @@ CREATE TABLE campaign_event_summary (
 - 포인트 만료 일시 관리 (메시지 발행 시 포함)
 - 병렬 처리를 위한 파티션 키 관리
 - Kafka 발행 상태 관리
+- 처리 차단 여부 관리 (잘못된 대상 제외)
 
 #### 컬럼 정의
 
@@ -268,6 +271,7 @@ CREATE TABLE campaign_event_summary (
 | `expiry_at` | TIMESTAMP | YES | 포인트 만료 일시 |
 | `partition_key` | INT | NO | 파티션 키 (0 ~ partition_count-1) |
 | `publish_status` | VARCHAR(20) | NO | 발행 상태 (`PENDING` / `PUBLISHED`) |
+| `is_blocked` | TINYINT(1) | NO | 차단 여부 (1: 차단, 0: 정상) |
 | `created_at` | TIMESTAMP | NO | 생성 일시 |
 | `updated_at` | TIMESTAMP | NO | 수정 일시 |
 
@@ -283,11 +287,12 @@ CREATE TABLE point_targets (
     expiry_at      TIMESTAMP NULL COMMENT '포인트 만료 일시',
     partition_key  INT NOT NULL COMMENT '파티션 키',
     publish_status VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / PUBLISHED',
+    is_blocked     TINYINT(1) NOT NULL DEFAULT 0 COMMENT '차단 여부',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     UNIQUE KEY uk_event_member (event_id, member_id),
-    INDEX idx_partition_publish (event_id, partition_key, publish_status),
+    INDEX idx_partition_publish (event_id, partition_key, publish_status, is_blocked),
     CONSTRAINT fk_point_target_event FOREIGN KEY (event_id) REFERENCES campaign_events(id)
 ) COMMENT '포인트 지급 대상';
 ```
@@ -358,6 +363,7 @@ CREATE TABLE point_results (
 - 상품권 만료 일시 관리 (메시지 발행 시 포함)
 - 병렬 처리를 위한 파티션 키 관리
 - Kafka 발행 상태 관리
+- 처리 차단 여부 관리 (잘못된 대상 제외)
 
 #### 컬럼 정의
 
@@ -371,6 +377,7 @@ CREATE TABLE point_results (
 | `expiry_at` | TIMESTAMP | YES | 상품권 만료 일시 |
 | `partition_key` | INT | NO | 파티션 키 (0 ~ partition_count-1) |
 | `publish_status` | VARCHAR(20) | NO | 발행 상태 (`PENDING` / `PUBLISHED`) |
+| `is_blocked` | TINYINT(1) | NO | 차단 여부 (1: 차단, 0: 정상) |
 | `created_at` | TIMESTAMP | NO | 생성 일시 |
 | `updated_at` | TIMESTAMP | NO | 수정 일시 |
 
@@ -386,11 +393,12 @@ CREATE TABLE voucher_targets (
     expiry_at      TIMESTAMP NULL COMMENT '상품권 만료 일시',
     partition_key  INT NOT NULL COMMENT '파티션 키',
     publish_status VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING / PUBLISHED',
+    is_blocked     TINYINT(1) NOT NULL DEFAULT 0 COMMENT '차단 여부',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     UNIQUE KEY uk_event_member (event_id, member_id),
-    INDEX idx_partition_publish (event_id, partition_key, publish_status),
+    INDEX idx_partition_publish (event_id, partition_key, publish_status, is_blocked),
     CONSTRAINT fk_voucher_target_event FOREIGN KEY (event_id) REFERENCES campaign_events(id)
 ) COMMENT '상품권 발행 대상';
 ```
