@@ -7,18 +7,17 @@
 |--------|------|
 | `campaign_events` | 캠페인 이벤트 메타 |
 | `campaign_event_summary` | 이벤트 처리 현황 |
+### 이벤트 상품권 발행 도메인
+| 테이블                     | 설명            |
+| ----------------------- | ------------- |
+| `event_voucher_targets` | 이벤트 상품권 발행 대상 |
+| `event_voucher_results` | 이벤트 상품권 발행 결과 |
 
-### 포인트 지급 도메인
-| 테이블             | 설명        |
-| --------------- | --------- |
-| `point_targets` | 포인트 지급 대상 |
-| `point_results` | 포인트 지급 결과 |
-
-### 상품권 발행 도메인
-| 테이블 | 설명 |
-|--------|------|
-| `voucher_targets` | 상품권 발행 대상 |
-| `voucher_results` | 상품권 발행 결과 |
+### 이벤트 포인트 지급 도메인
+| 테이블                   | 설명            |
+| --------------------- | ------------- |
+| `event_point_targets` | 이벤트 포인트 지급 대상 |
+| `event_point_results` | 이벤트 포인트 지급 결과 |
 
 ---
 
@@ -27,10 +26,10 @@
 ```mermaid
 erDiagram
     campaign_events ||--|| campaign_event_summary : has
-    campaign_events ||--o{ point_targets : contains
-    campaign_events ||--o{ voucher_targets : contains
-    point_targets ||--o| point_results : has_result
-    voucher_targets ||--o| voucher_results : has_result
+    campaign_events ||--o{ event_voucher_targets : contains
+    campaign_events ||--o{ event_point_targets : contains
+    event_voucher_targets ||--o| event_voucher_results : has_result
+    event_point_targets ||--o| event_point_results : has_result
     
     campaign_events {
         id bigint PK
@@ -65,7 +64,7 @@ erDiagram
         updated_at timestamp
     }
     
-    point_targets {
+    event_voucher_targets {
         id bigint PK
         event_id bigint FK
         member_id varchar
@@ -79,7 +78,7 @@ erDiagram
         updated_at timestamp
     }
     
-    point_results {
+    event_voucher_results {
         id bigint PK
         target_id bigint FK "UK"
         status varchar
@@ -90,7 +89,7 @@ erDiagram
         updated_at timestamp
     }
     
-    voucher_targets {
+    event_point_targets {
         id bigint PK
         event_id bigint FK
         member_id varchar
@@ -104,7 +103,7 @@ erDiagram
         updated_at timestamp
     }
     
-    voucher_results {
+    event_point_results {
         id bigint PK
         target_id bigint FK "UK"
         status varchar
@@ -247,7 +246,7 @@ CREATE TABLE campaign_event_summary (
 
 ---
 
-### 3️⃣ `point_targets` (포인트 지급 대상)
+### 3️⃣ `event_point_targets` (포인트 지급 대상)
 
 > 포인트 지급 대상자 목록을 저장하는 테이블
 
@@ -278,7 +277,7 @@ CREATE TABLE campaign_event_summary (
 #### DDL
 
 ```sql
-CREATE TABLE point_targets (
+CREATE TABLE event_point_targets (
     id             BIGINT PRIMARY KEY AUTO_INCREMENT,
     event_id       BIGINT NOT NULL COMMENT 'campaign_events.id 참조',
     member_id      VARCHAR(50) NOT NULL COMMENT '회원 ID',
@@ -293,13 +292,13 @@ CREATE TABLE point_targets (
     
     UNIQUE KEY uk_event_member (event_id, member_id),
     INDEX idx_partition_publish (event_id, partition_key, publish_status, is_blocked),
-    CONSTRAINT fk_point_target_event FOREIGN KEY (event_id) REFERENCES campaign_events(id)
+    CONSTRAINT fk_event_point_target FOREIGN KEY (event_id) REFERENCES campaign_events(id)
 ) COMMENT '포인트 지급 대상';
 ```
 
 ---
 
-### 4️⃣ `point_results` (포인트 지급 결과)
+### 4️⃣ `event_point_results` (포인트 지급 결과)
 
 > 포인트 지급 처리 결과를 저장하는 테이블 (멱등성 보장)
 
@@ -312,16 +311,16 @@ CREATE TABLE point_targets (
 
 #### 컬럼 정의
 
-| Column | Type | Nullable | Description |
-|--------|------|:--------:|-------------|
-| `id` | BIGINT | NO | 결과 ID (PK, AUTO_INCREMENT) |
-| `target_id` | BIGINT | NO | point_targets.id (FK, UK) - 멱등성 키 |
-| `status` | VARCHAR(20) | NO | 처리 상태 |
-| `money_tx_id` | VARCHAR(100) | YES | money 트랜잭션 ID |
-| `error_message` | VARCHAR(500) | YES | 에러 메시지 |
-| `retry_count` | INT | NO | 재시도 횟수 |
-| `created_at` | TIMESTAMP | NO | 생성 일시 |
-| `updated_at` | TIMESTAMP | NO | 수정 일시 |
+| Column          | Type         | Nullable | Description                             |
+| --------------- | ------------ | :------: | --------------------------------------- |
+| `id`            | BIGINT       |    NO    | 결과 ID (PK, AUTO_INCREMENT)              |
+| `target_id`     | BIGINT       |    NO    | event_point_targets.id (FK, UK) - 멱등성 키 |
+| `status`        | VARCHAR(20)  |    NO    | 처리 상태                                   |
+| `money_tx_id`   | VARCHAR(100) |   YES    | money 트랜잭션 ID                           |
+| `error_message` | VARCHAR(500) |   YES    | 에러 메시지                                  |
+| `retry_count`   | INT          |    NO    | 재시도 횟수                                  |
+| `created_at`    | TIMESTAMP    |    NO    | 생성 일시                                   |
+| `updated_at`    | TIMESTAMP    |    NO    | 수정 일시                                   |
 
 #### 상태 정의
 
@@ -335,7 +334,7 @@ CREATE TABLE point_targets (
 #### DDL
 
 ```sql
-CREATE TABLE point_results (
+CREATE TABLE event_point_results (
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
     target_id     BIGINT NOT NULL COMMENT 'point_targets.id 참조',
     status        VARCHAR(20) NOT NULL DEFAULT 'PENDING',
@@ -353,7 +352,7 @@ CREATE TABLE point_results (
 
 ---
 
-### 5️⃣ `voucher_targets` (상품권 발행 대상)
+### 5️⃣ `event_voucher_targets` (상품권 발행 대상)
 
 > 상품권 발행 대상자 목록을 저장하는 테이블
 
@@ -367,24 +366,24 @@ CREATE TABLE point_results (
 
 #### 컬럼 정의
 
-| Column | Type | Nullable | Description |
-|--------|------|:--------:|-------------|
-| `id` | BIGINT | NO | 대상 ID (PK, AUTO_INCREMENT) |
-| `event_id` | BIGINT | NO | campaign_events.id (FK) |
-| `member_id` | VARCHAR(50) | NO | 회원 ID |
-| `amount` | BIGINT | NO | 발행 금액 |
-| `reason` | VARCHAR(500) | YES | 개별 사유 (NULL이면 default_reason 사용) |
-| `expiry_at` | TIMESTAMP | YES | 상품권 만료 일시 |
-| `partition_key` | INT | NO | 파티션 키 (0 ~ partition_count-1) |
-| `publish_status` | VARCHAR(20) | NO | 발행 상태 (`PENDING` / `PUBLISHED`) |
-| `is_blocked` | TINYINT(1) | NO | 차단 여부 (1: 차단, 0: 정상) |
-| `created_at` | TIMESTAMP | NO | 생성 일시 |
-| `updated_at` | TIMESTAMP | NO | 수정 일시 |
+| Column           | Type         | Nullable | Description                      |
+| ---------------- | ------------ | :------: | -------------------------------- |
+| `id`             | BIGINT       |    NO    | 대상 ID (PK, AUTO_INCREMENT)       |
+| `event_id`       | BIGINT       |    NO    | campaign_events.id (FK)          |
+| `member_id`      | VARCHAR(50)  |    NO    | 회원 ID                            |
+| `amount`         | BIGINT       |    NO    | 발행 금액                            |
+| `reason`         | VARCHAR(500) |   YES    | 개별 사유 (NULL이면 default_reason 사용) |
+| `expiry_at`      | TIMESTAMP    |   YES    | 상품권 만료 일시                        |
+| `partition_key`  | INT          |    NO    | 파티션 키 (0 ~ partition_count-1)    |
+| `publish_status` | VARCHAR(20)  |    NO    | 발행 상태 (`PENDING` / `PUBLISHED`)  |
+| `is_blocked`     | TINYINT(1)   |    NO    | 차단 여부 (1: 차단, 0: 정상)             |
+| `created_at`     | TIMESTAMP    |    NO    | 생성 일시                            |
+| `updated_at`     | TIMESTAMP    |    NO    | 수정 일시                            |
 
 #### DDL
 
 ```sql
-CREATE TABLE voucher_targets (
+CREATE TABLE event_voucher_targets (
     id             BIGINT PRIMARY KEY AUTO_INCREMENT,
     event_id       BIGINT NOT NULL COMMENT 'campaign_events.id 참조',
     member_id      VARCHAR(50) NOT NULL COMMENT '회원 ID',
@@ -399,13 +398,13 @@ CREATE TABLE voucher_targets (
     
     UNIQUE KEY uk_event_member (event_id, member_id),
     INDEX idx_partition_publish (event_id, partition_key, publish_status, is_blocked),
-    CONSTRAINT fk_voucher_target_event FOREIGN KEY (event_id) REFERENCES campaign_events(id)
+    CONSTRAINT fk_event_voucher_target FOREIGN KEY (event_id) REFERENCES campaign_events(id)
 ) COMMENT '상품권 발행 대상';
 ```
 
 ---
 
-### 6️⃣ `voucher_results` (상품권 발행 결과)
+### 6️⃣ `event_voucher_results` (상품권 발행 결과)
 
 > 상품권 발행 처리 결과를 저장하는 테이블 (멱등성 보장)
 
@@ -419,19 +418,19 @@ CREATE TABLE voucher_targets (
 
 #### 컬럼 정의
 
-| Column | Type | Nullable | Description |
-|--------|------|:--------:|-------------|
-| `id` | BIGINT | NO | 결과 ID (PK, AUTO_INCREMENT) |
-| `target_id` | BIGINT | NO | voucher_targets.id (FK, UK) - 멱등성 키 |
-| `status` | VARCHAR(20) | NO | 처리 상태 |
-| `money_tx_id` | VARCHAR(100) | YES | money 트랜잭션 ID |
-| `voucher_code` | VARCHAR(50) | YES | 상품권 코드 |
-| `voucher_pin` | VARCHAR(20) | YES | 상품권 PIN |
-| `voucher_expiry_at` | TIMESTAMP | YES | 상품권 만료 일시 (발행 시 반환값) |
-| `error_message` | VARCHAR(500) | YES | 에러 메시지 |
-| `retry_count` | INT | NO | 재시도 횟수 |
-| `created_at` | TIMESTAMP | NO | 생성 일시 |
-| `updated_at` | TIMESTAMP | NO | 수정 일시 |
+| Column              | Type         | Nullable | Description                               |
+| ------------------- | ------------ | :------: | ----------------------------------------- |
+| `id`                | BIGINT       |    NO    | 결과 ID (PK, AUTO_INCREMENT)                |
+| `target_id`         | BIGINT       |    NO    | event_voucher_targets.id (FK, UK) - 멱등성 키 |
+| `status`            | VARCHAR(20)  |    NO    | 처리 상태                                     |
+| `money_tx_id`       | VARCHAR(100) |   YES    | money 트랜잭션 ID                             |
+| `voucher_code`      | VARCHAR(50)  |   YES    | 상품권 코드                                    |
+| `voucher_pin`       | VARCHAR(20)  |   YES    | 상품권 PIN                                   |
+| `voucher_expiry_at` | TIMESTAMP    |   YES    | 상품권 만료 일시 (발행 시 반환값)                      |
+| `error_message`     | VARCHAR(500) |   YES    | 에러 메시지                                    |
+| `retry_count`       | INT          |    NO    | 재시도 횟수                                    |
+| `created_at`        | TIMESTAMP    |    NO    | 생성 일시                                     |
+| `updated_at`        | TIMESTAMP    |    NO    | 수정 일시                                     |
 
 #### 상태 정의
 
@@ -445,7 +444,7 @@ CREATE TABLE voucher_targets (
 #### DDL
 
 ```sql
-CREATE TABLE voucher_results (
+CREATE TABLE event_voucher_results (
     id                BIGINT PRIMARY KEY AUTO_INCREMENT,
     target_id         BIGINT NOT NULL COMMENT 'voucher_targets.id 참조',
     status            VARCHAR(20) NOT NULL DEFAULT 'PENDING',
@@ -470,14 +469,14 @@ CREATE TABLE voucher_results (
 
 ### 테이블 역할 구분
 
-| 구분 | 테이블 | 역할 | 변경 빈도 |
-|------|--------|------|-----------|
-| **공통** | `campaign_events` | 정의/설정 (What) | 거의 없음 |
-| **공통** | `campaign_event_summary` | 실행 현황 (How) | 자주 업데이트 |
-| **포인트** | `point_targets` | 지급 대상 | 생성 후 상태만 변경 |
-| **포인트** | `point_results` | 지급 결과 | 처리 시 INSERT/UPDATE |
-| **상품권** | `voucher_targets` | 발행 대상 | 생성 후 상태만 변경 |
-| **상품권** | `voucher_results` | 발행 결과 | 처리 시 INSERT/UPDATE |
+| 구분      | 테이블                      | 역할           | 변경 빈도              |
+| ------- | ------------------------ | ------------ | ------------------ |
+| **공통**  | `campaign_events`        | 정의/설정 (What) | 거의 없음              |
+| **공통**  | `campaign_event_summary` | 실행 현황 (How)  | 자주 업데이트            |
+| **포인트** | `event_point_targets`    | 지급 대상        | 생성 후 상태만 변경        |
+| **포인트** | `event_point_results`    | 지급 결과        | 처리 시 INSERT/UPDATE |
+| **상품권** | `event_voucher_targets`  | 발행 대상        | 생성 후 상태만 변경        |
+| **상품권** | `event_voucher_results`  | 발행 결과        | 처리 시 INSERT/UPDATE |
 
 ### partition_key 생성 규칙
 
