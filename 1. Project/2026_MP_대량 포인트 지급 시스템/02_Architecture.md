@@ -476,19 +476,19 @@ WHERE id IN (:publishedIds);
 
 ## 🔐 멱등성 보장 전략
 
-### 단일 계층 구조: DB Unique Constraint
+### 단일 계층 구조: DB 복합 PK
 
 > [!note] 간소화 배경
 > - DB partition_key를 Kafka Partition으로 직접 지정 → **Worker N → Partition N → Consumer N 경로 확정**
 > - Message Key(`campaign_id + member_id`)로 파티션 내 순서 보장
-> - **DB Unique Constraint 단일 계층으로 충분**
+> - **DB 복합 PK 단일 계층으로 충분**
 > - 외부 서비스(money API) 의존성 제거로 결합도 감소
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  🔐 멱등성 보장 구조                                            │
 ├─────────────────────────────────────────────────────────────┤
-│  DB Unique Constraint (target_id)                           │
+│  DB 복합 PK (event_id, target_id)                            │
 │  → INSERT 시도 시 중복이면 DuplicateKeyException 발생            │
 │  → 예외 처리로 Skip 하여 멱등성 보장                               │
 └─────────────────────────────────────────────────────────────┘
@@ -496,7 +496,7 @@ WHERE id IN (:publishedIds);
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  ✅ 왜 단일 계층으로 충분한가?                                    │
+│  ✅ 왜 복합 PK인가?                                            │
 ├─────────────────────────────────────────────────────────────┤
 │  1. Kafka 파티션 직접 지정 + Message Key 순서 보장               │
 │     - Partition: DB partition_key로 직접 지정                  │
@@ -504,10 +504,14 @@ WHERE id IN (:publishedIds);
 │     → 같은 회원 메시지는 같은 파티션 → 같은 Consumer               │
 │     → 파티션 내 순서 보장으로 동시 처리 불가                         │
 │                                                             │
-│  2. DB Unique Constraint (target_id)                        │
+│  2. DB 복합 PK (event_id, target_id)                         │
 │     → Consumer 리밸런싱, 메시지 재발행 시에도 중복 방지              │
 │     → 어떤 예외 상황에서도 중복 INSERT 원천 차단                    │
 │     → target 당 1개의 result만 생성 보장                        │
+│                                                             │
+│  3. target 테이블 초기화 대응                                   │
+│     → target_id만 사용 시 AUTO_INCREMENT 리셋 문제 발생 가능       │
+│     → event_id + target_id 복합키로 이벤트 간 충돌 방지            │
 │                                                             │
 │  ※ 외부 API(money) Idempotency-Key 미사용                      │
 │     → money 서비스 스펙 변경에 영향받지 않음                        │
@@ -515,11 +519,11 @@ WHERE id IN (:publishedIds);
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### DB Unique Constraint 설계
+### DB 복합 PK 설계
 
 ```sql
 CREATE TABLE payment_result (
-    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    event_id      BIGINT NOT NULL COMMENT 'campaign_events.id 참조',
     target_id     BIGINT NOT NULL COMMENT 'payment_target.id 참조',
     status        VARCHAR(20) NOT NULL,
     money_tx_id   VARCHAR(100),
@@ -528,9 +532,9 @@ CREATE TABLE payment_result (
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    -- 멱등성 보장 (target 당 1개 결과)
-    UNIQUE KEY uk_target (target_id),
-    CONSTRAINT fk_result_target FOREIGN KEY (target_id) REFERENCES payment_target(id)
+    -- 멱등성 보장 (복합 PK)
+    PRIMARY KEY (event_id, target_id),
+    INDEX idx_status (event_id, status)
 );
 ```
 
@@ -554,7 +558,7 @@ CREATE TABLE payment_result (
 │  ┌──────────────────────────┐                               │
 │  │ DB INSERT 시도            │                               │
 │  │ payment_result 테이블      │                               │
-│  │ (target_id)              │                               │
+│  │ PK: (event_id, target_id)│                               │
 │  └────────┬─────────────────┘                               │
 │           │                                                 │
 │     ┌─────┴─────┐                                           │
@@ -634,8 +638,8 @@ erDiagram
     }
     
     PAYMENT_RESULT {
-        bigint id PK
-        bigint target_id FK_UK "멱등성 키"
+        bigint event_id PK_FK
+        bigint target_id PK_FK
         varchar status
         varchar money_tx_id
         varchar error_message
@@ -684,7 +688,7 @@ CREATE TABLE payment_target (
 
 -- 지급 결과 테이블
 CREATE TABLE payment_result (
-    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    event_id      BIGINT NOT NULL COMMENT 'campaign_events.id 참조',
     target_id     BIGINT NOT NULL COMMENT 'payment_target.id 참조',
     status        VARCHAR(20) NOT NULL,
     money_tx_id   VARCHAR(100),
@@ -693,9 +697,8 @@ CREATE TABLE payment_result (
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    UNIQUE KEY uk_target (target_id),
-    INDEX idx_status (status),
-    CONSTRAINT fk_result_target FOREIGN KEY (target_id) REFERENCES payment_target(id)
+    PRIMARY KEY (event_id, target_id),
+    INDEX idx_status (event_id, status)
 );
 ```
 

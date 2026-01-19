@@ -79,8 +79,8 @@ erDiagram
     }
     
     event_voucher_results {
-        id bigint PK
-        target_id bigint FK "UK"
+        event_id bigint PK_FK
+        target_id bigint PK_FK
         status varchar
         money_tx_id varchar
         error_message varchar
@@ -104,8 +104,8 @@ erDiagram
     }
     
     event_point_results {
-        id bigint PK
-        target_id bigint FK "UK"
+        event_id bigint PK_FK
+        target_id bigint PK_FK
         status varchar
         money_tx_id varchar
         error_message varchar
@@ -303,7 +303,7 @@ CREATE TABLE event_point_targets (
 > 포인트 지급 처리 결과를 저장하는 테이블 (멱등성 보장)
 
 #### 요구 사항
-- target 참조를 통한 정규화 (중복 데이터 제거)
+- 복합 PK를 통한 멱등성 보장 (event_id + target_id)
 - 지급 처리 결과 상태 관리
 - money 시스템 트랜잭션 ID 저장
 - 실패 시 에러 메시지 저장
@@ -311,10 +311,10 @@ CREATE TABLE event_point_targets (
 
 #### 컬럼 정의
 
-| Column          | Type         | Nullable | Description                             |
-| --------------- | ------------ | :------: | --------------------------------------- |
-| `id`            | BIGINT       |    NO    | 결과 ID (PK, AUTO_INCREMENT)              |
-| `target_id`     | BIGINT       |    NO    | event_point_targets.id (FK, UK) - 멱등성 키 |
+| Column          | Type         | Nullable | Description                               |
+| --------------- | ------------ | :------: | ----------------------------------------- |
+| `event_id`      | BIGINT       |    NO    | campaign_events.id (PK)                   |
+| `target_id`     | BIGINT       |    NO    | event_point_targets.id (PK)               |
 | `status`        | VARCHAR(20)  |    NO    | 처리 상태                                   |
 | `money_tx_id`   | VARCHAR(100) |   YES    | money 트랜잭션 ID                           |
 | `error_message` | VARCHAR(500) |   YES    | 에러 메시지                                  |
@@ -335,8 +335,8 @@ CREATE TABLE event_point_targets (
 
 ```sql
 CREATE TABLE event_point_results (
-    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
-    target_id     BIGINT NOT NULL COMMENT 'point_targets.id 참조',
+    event_id      BIGINT NOT NULL COMMENT 'campaign_events.id 참조',
+    target_id     BIGINT NOT NULL COMMENT 'event_point_targets.id 참조',
     status        VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     money_tx_id   VARCHAR(100) NULL COMMENT 'money 시스템 트랜잭션 ID',
     error_message VARCHAR(500) NULL COMMENT '에러 메시지',
@@ -344,9 +344,8 @@ CREATE TABLE event_point_results (
     created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    UNIQUE KEY uk_target (target_id),
-    INDEX idx_status (status),
-    CONSTRAINT fk_point_result_target FOREIGN KEY (target_id) REFERENCES point_targets(id)
+    PRIMARY KEY (event_id, target_id),
+    INDEX idx_status (event_id, status)
 ) COMMENT '포인트 지급 결과';
 ```
 
@@ -409,7 +408,7 @@ CREATE TABLE event_voucher_targets (
 > 상품권 발행 처리 결과를 저장하는 테이블 (멱등성 보장)
 
 #### 요구 사항
-- target 참조를 통한 정규화 (중복 데이터 제거)
+- 복합 PK를 통한 멱등성 보장 (event_id + target_id)
 - 발행 처리 결과 상태 관리
 - money 시스템 트랜잭션 ID 저장
 - 상품권 코드, PIN, 만료일 저장
@@ -420,8 +419,8 @@ CREATE TABLE event_voucher_targets (
 
 | Column              | Type         | Nullable | Description                               |
 | ------------------- | ------------ | :------: | ----------------------------------------- |
-| `id`                | BIGINT       |    NO    | 결과 ID (PK, AUTO_INCREMENT)                |
-| `target_id`         | BIGINT       |    NO    | event_voucher_targets.id (FK, UK) - 멱등성 키 |
+| `event_id`          | BIGINT       |    NO    | campaign_events.id (PK)                   |
+| `target_id`         | BIGINT       |    NO    | event_voucher_targets.id (PK)             |
 | `status`            | VARCHAR(20)  |    NO    | 처리 상태                                     |
 | `money_tx_id`       | VARCHAR(100) |   YES    | money 트랜잭션 ID                             |
 | `voucher_code`      | VARCHAR(50)  |   YES    | 상품권 코드                                    |
@@ -445,8 +444,8 @@ CREATE TABLE event_voucher_targets (
 
 ```sql
 CREATE TABLE event_voucher_results (
-    id                BIGINT PRIMARY KEY AUTO_INCREMENT,
-    target_id         BIGINT NOT NULL COMMENT 'voucher_targets.id 참조',
+    event_id          BIGINT NOT NULL COMMENT 'campaign_events.id 참조',
+    target_id         BIGINT NOT NULL COMMENT 'event_voucher_targets.id 참조',
     status            VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     money_tx_id       VARCHAR(100) NULL COMMENT 'money 시스템 트랜잭션 ID',
     voucher_code      VARCHAR(50) NULL COMMENT '상품권 코드',
@@ -457,9 +456,8 @@ CREATE TABLE event_voucher_results (
     created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    UNIQUE KEY uk_target (target_id),
-    INDEX idx_status (status),
-    CONSTRAINT fk_voucher_result_target FOREIGN KEY (target_id) REFERENCES voucher_targets(id)
+    PRIMARY KEY (event_id, target_id),
+    INDEX idx_status (event_id, status)
 ) COMMENT '상품권 발행 결과';
 ```
 
