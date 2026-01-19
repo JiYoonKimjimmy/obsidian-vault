@@ -33,7 +33,8 @@ erDiagram
     
     campaign_events {
         id bigint PK
-        campaign_id varchar UK
+        campaign_code varchar UK
+        campaign_name varchar
         event_type varchar
         event_status varchar
         default_reason varchar
@@ -67,7 +68,7 @@ erDiagram
     event_voucher_targets {
         id bigint PK
         event_id bigint FK
-        member_id varchar
+        customer_uid bigint
         amount bigint
         reason varchar
         expiry_at timestamp
@@ -82,7 +83,8 @@ erDiagram
         event_id bigint PK
         target_id bigint PK
         status varchar
-        money_tx_id varchar
+        transaction_key varchar
+        voucher_number varchar
         error_message varchar
         retry_count int
         created_at timestamp
@@ -92,7 +94,7 @@ erDiagram
     event_point_targets {
         id bigint PK
         event_id bigint FK
-        member_id varchar
+        customer_uid bigint
         amount bigint
         reason varchar
         expiry_at timestamp
@@ -107,7 +109,7 @@ erDiagram
         event_id bigint PK
         target_id bigint PK
         status varchar
-        money_tx_id varchar
+        transaction_id varchar
         error_message varchar
         retry_count int
         created_at timestamp
