@@ -79,8 +79,8 @@ erDiagram
     }
     
     event_voucher_results {
-        event_id bigint PK_FK
-        target_id bigint PK_FK
+        event_id bigint PK
+        target_id bigint PK
         status varchar
         money_tx_id varchar
         error_message varchar
@@ -104,8 +104,8 @@ erDiagram
     }
     
     event_point_results {
-        event_id bigint PK_FK
-        target_id bigint PK_FK
+        event_id bigint PK
+        target_id bigint PK
         status varchar
         money_tx_id varchar
         error_message varchar
