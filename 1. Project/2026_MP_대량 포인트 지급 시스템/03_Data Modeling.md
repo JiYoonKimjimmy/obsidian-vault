@@ -3,21 +3,21 @@
 ## 📋 테이블 목록
 
 ### 공통 레이어
-| 테이블 | 설명 |
-|--------|------|
-| `campaign_events` | 캠페인 이벤트 메타 |
-| `campaign_event_summary` | 이벤트 처리 현황 |
+| 테이블               | 설명         |
+| ----------------- | ---------- |
+| `campaign_events` | 캠페인 이벤트 정보 |
+| `event_summary`   | 이벤트 처리 현황  |
 ### 이벤트 상품권 발행 도메인
 | 테이블                     | 설명            |
 | ----------------------- | ------------- |
-| `event_voucher_targets` | 이벤트 상품권 발행 대상 |
-| `event_voucher_results` | 이벤트 상품권 발행 결과 |
+| `voucher_event_targets` | 상품권 이벤트 처리 대상 |
+| `voucher_event_results` | 상품권 이벤트 처리 결과 |
 
 ### 이벤트 포인트 지급 도메인
 | 테이블                   | 설명            |
 | --------------------- | ------------- |
-| `event_point_targets` | 이벤트 포인트 지급 대상 |
-| `event_point_results` | 이벤트 포인트 지급 결과 |
+| `point_event_targets` | 포인트 이벤트 처리 대상 |
+| `point_event_results` | 포인트 이벤트 처리 결과 |
 
 ---
 
@@ -25,11 +25,11 @@
 
 ```mermaid
 erDiagram
-    campaign_events ||--|| campaign_event_summary : has
-    campaign_events ||--o{ event_voucher_targets : contains
-    campaign_events ||--o{ event_point_targets : contains
-    event_voucher_targets ||--o| event_voucher_results : has_result
-    event_point_targets ||--o| event_point_results : has_result
+    campaign_events ||--|| event_summary : has
+    campaign_events ||--o{ voucher_event_targets : contains
+    campaign_events ||--o{ point_event_targets : contains
+    voucher_event_targets ||--o| voucher_event_results : has_result
+    point_event_targets ||--o| point_event_results : has_result
     
     campaign_events {
         id bigint PK
@@ -50,7 +50,7 @@ erDiagram
         updated_at timestamp
     }
     
-    campaign_event_summary {
+    event_summary {
         id bigint PK
         event_id bigint FK
         published_count int
@@ -65,7 +65,7 @@ erDiagram
         updated_at timestamp
     }
     
-    event_voucher_targets {
+    voucher_event_targets {
         id bigint PK
         event_id bigint FK
         customer_uid bigint
@@ -79,7 +79,7 @@ erDiagram
         updated_at timestamp
     }
     
-    event_voucher_results {
+    voucher_event_results {
         event_id bigint PK
         target_id bigint PK
         status varchar
@@ -91,7 +91,7 @@ erDiagram
         updated_at timestamp
     }
     
-    event_point_targets {
+    point_event_targets {
         id bigint PK
         event_id bigint FK
         customer_uid bigint
@@ -105,7 +105,7 @@ erDiagram
         updated_at timestamp
     }
     
-    event_point_results {
+    point_event_results {
         event_id bigint PK
         target_id bigint PK
         status varchar
