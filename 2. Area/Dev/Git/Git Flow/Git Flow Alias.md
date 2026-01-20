@@ -3,11 +3,11 @@
 
 ```bash
 # ~/.bashrc
-alias start_git_feature='D:\\shell\\git_flow_feature.sh start'
-alias finish_git_feature='D:\\shell\\git_flow_feature.sh finish'
-alias merge_git_branch='D:\\shell\\merge_git_branch.sh'
-alias push_git_branch='D:\\shell\\push_git_branch.sh'
-alias pull_git_branch='D:\\shell\\pull_git_branch.sh'
+alias start_git_feature='~/scripts/gitflow/git_flow_feature.sh start'
+alias finish_git_feature='~/scripts/gitflow/git_flow_feature.sh finish'
+alias merge_git_branch='~/scripts/gitflow/merge_git_branch.sh'
+alias push_git_branch='~/scripts/gitflow/push_git_branch.sh'
+alias pull_git_branch='~/scripts/gitflow/pull_git_branch.sh'
 ```
 
 ## Git Flow 초기화
