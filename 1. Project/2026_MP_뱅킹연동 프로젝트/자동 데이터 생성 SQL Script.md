@@ -1,4 +1,3 @@
-
 ```sql
 -- ============================================================  
 -- DataGrip용 캠페인 프로모션 테스트 데이터 생성 스크립트  
@@ -318,7 +317,7 @@ BEGIN
 END;  
   
 -- 테스트 데이터 전체 삭제 (TEST- 로 시작하는 캠페인)  
-DROP PROCEDURE IF EXISTS prepay_admin.delete_all_campaign_test_data //  
+DROP PROCEDURE IF EXISTS prepay_admin.delete_all_campaign_test_data;  
   
 CREATE PROCEDURE prepay_admin.delete_all_campaign_test_data()  
 BEGIN  
