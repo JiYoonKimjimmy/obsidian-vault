@@ -5,7 +5,7 @@
 - client 모듈 개발은 함께
 
 ## 개발 Task
-1. [ ] 잔액 조회
+1. [x] 잔액 조회
 	1. [ ] `LINKED_BANK_TYPE` session 값 초기 설정 시점 확인 필요
 2. [ ] 상품 사전 조회
 	1. [ ] 케이뱅크에서 계좌 개설 완료 후 호출할 `callbackUrl` 중요
